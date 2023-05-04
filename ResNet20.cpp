@@ -207,9 +207,19 @@ int main() {
     ////////////////////
     /////// DSB1 ///////
     ////////////////////
+    
     std::cout << "layer3_DSB1 .. " << std::endl;
     vector<vector<Ciphertext>> ctxt_block4relu1_out;
-    ctxt_block4relu1_out = DSB1(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, layer2_block2_out);
+    
+    string path4 = common_path_mult + string("layer3_0_downsample_weight_32_16_1_1.txt");
+    string path4a = common_path_sum + string("layer3_0_downsample_bias_32.txt");
+    string path4_2 = common_path_mult + string("layer3_0_conv1_weight_32_16_3_3.txt");
+    string path4_2a = common_path_sum + string("layer3_0_conv1_bias_32.txt");
+    string path4_3 = common_path_mult + string("layer3_0_conv2_weight_32_32_3_3.txt");
+    string path4_3a = common_path_sum + string("layer3_0_conv2_bias_32.txt");
+
+    ctxt_block4relu1_out = DSB1(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, 
+                                path4, path4a, path4_2, path4_2a, path4_3, path4_3a, layer2_block2_out);
     
     cout << "DONE!, decrypted message is ... " << "\n";
     dec.decrypt(ctxt_block4relu1_out[0][0], sk, dmsg);
@@ -217,10 +227,10 @@ int main() {
     cout <<"\n";
 
 
-
     ////////////////////
     /////// RB4 ////////
     ////////////////////
+    
     std::cout << "layer3_RB1 .. " << std::endl;
     vector<vector<Ciphertext>> layer3_block1_out;
     string path20 = common_path_mult + string("layer3_1_conv1_weight_32_32_3_3.txt");
@@ -261,11 +271,19 @@ int main() {
     ////////////////////
     /////// DSB2 ///////
     ////////////////////
-    // block화 시키기...
-    // 으로 retrun: ctxt_block7relu1_out
+    
     std::cout << "layer4_DSB2 .. " << std::endl;
     vector<vector<Ciphertext>> ctxt_block7relu1_out;
-    ctxt_block7relu1_out = DSB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, layer3_block2_out);
+    
+    string path37 = common_path_mult + string("layer4_0_downsample_weight_64_32_1_1.txt");
+    string path37a = common_path_sum + string("layer4_0_downsample_bias_64.txt");
+    string path37_2 = common_path_mult + string("layer4_0_conv1_weight_64_32_3_3.txt");
+    string path37_2a = common_path_sum + string("layer4_0_conv1_bias_64.txt");
+    string path37_3 = common_path_mult + string("layer4_0_conv2_weight_64_64_3_3.txt");
+    string path37_3a = common_path_sum + string("layer4_0_conv2_bias_64.txt");
+    
+    ctxt_block7relu1_out = DSB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, 
+                                path37, path37a, path37_2, path37_2a, path37_3, path37_3a, layer3_block2_out);
     
     cout << "DONE!, decrypted message is ... " << "\n";
     dec.decrypt(ctxt_block7relu1_out[0][0], sk, dmsg);
