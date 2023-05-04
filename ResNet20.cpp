@@ -13,8 +13,7 @@
 #include "kernelEncode.hpp"
 #include "imageEncode.hpp"
 #include "AvgpoolFC64.hpp"
-#include "RB.hpp"
-#include "DSB.hpp"
+#include "ConvBlock.hpp"
 
 namespace {
     using namespace HEaaN;
