@@ -119,10 +119,9 @@ int main() {
     cout << "DONE\n" << "\n";
     
     
-    
     ////////////////common path//////////////////////////////////
-    string common_path_mult = "/app/HEAAN-ResNet-110/resnet110/multiplicands/";
-    string common_path_sum = "/app/HEAAN-ResNet-110/resnet110/summands/";
+    string common_path_mult = "/app/HEAAN-ResNet/kernel/ResNet20/multiplicands/";
+    string common_path_sum = "/app/HEAAN-ResNet/kernel/ResNet20/summands/";
     ////////////////////////////////////////////////////////////
     
     //// 0st conv ///
