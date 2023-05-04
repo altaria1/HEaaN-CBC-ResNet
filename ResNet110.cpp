@@ -114,11 +114,11 @@ int main() {
     printMessage(dmsg);
 
     cout << "DONE\n" << "\n";
-    
+   
     
     ////////////////common path//////////////////////////////////
-    string common_path_mult = "/app/HEAAN-ResNet-110/resnet110/multiplicands/";
-    string common_path_sum = "/app/HEAAN-ResNet-110/resnet110/summands/";
+    string common_path_mult = "/app/HEAAN-ResNet/kernel/ResNet110/multiplicands/";
+    string common_path_sum = "/app/HEAAN-ResNet/kernel/ResNet110/summands/";
     ////////////////////////////////////////////////////////////
    
     
