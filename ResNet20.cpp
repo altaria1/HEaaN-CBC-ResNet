@@ -78,14 +78,15 @@ int main() {
 
     double cnst = (double)(1.0 / 40.0);
     Ciphertext ctxt_init(context);
-    // for 64 x 64 test , change enc level 5
+    
+    //for 64 x 64 test , change enc level 5
     //enc.encrypt(msg_zero, pack, ctxt_init, 0, 0);
     enc.encrypt(msg_zero, pack, ctxt_init, 5, 0);
     Plaintext ptxt_init(context);
+    
     // for 64 x 64 test, change enc level 5
     //ptxt_init = ecd.encode(msg_zero, 0, 0);
     ptxt_init = ecd.encode(msg_zero, 5, 0);
-
 
 
 
@@ -93,27 +94,22 @@ int main() {
     ///////////// 10000 test image Encoding ///////////////////
     ////////////////////////////////////////////////////////////
 
-    cout << "10000 test images encoding ... \n";
-
     int num;
-
-    cout << "Choose one of bundle from 1 to 20 \n";
+    
+    cout << "10000 test image encoding; choose one of bundle from 1 to 20 \n;
     cin >> num;
 
-    cout << "\n Image Loading ..." << "\n";
-    
     vector<vector<Ciphertext>> imageVec(16, vector<Ciphertext>(3, ctxt_zero));
-
+    
     #pragma omp parallel for
     for (int i = (num-1) * 16; i < num*16; ++i) { // 313
         int ind = i+1;
-        string str = "/app/HEAAN-ResNet-20/image/image_" + to_string(ind) + string(".txt");
+        string str = "/app/HEAAN-ResNet-110/image/image_" + to_string(ind) + string(".txt");
         vector<double> temp;
         txtreader(temp, str);
         imageCompiler(context, pack, enc, 5, temp, imageVec[(i%16)]);
 
     }
-
 
     cout << "DONE, test for image encode ..." << "\n";
 
@@ -122,127 +118,29 @@ int main() {
     printMessage(dmsg);
 
     cout << "DONE\n" << "\n";
-
-
     
-    ////////////////////////////common path///////////////////////////////////
-    string common_path_mult = "/app/HEAAN-ResNet-20/kernel/multiplicands/";
-    string common_path_sum = "/app/HEAAN-ResNet-20/kernel/summands/";
-    //////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////test///////////////////////////////////////////////////////
-    // test for the 64 x 64 case
-    cout << "test start" << endl;
-    vector<vector<Ciphertext>> ctxt_conv0_out;
-    vector<Ciphertext> convtemp(64, ctxt_init);
     
-    vector<double> kernel_info1;
-    string pathmult1 = common_path_mult + string("layer4_1_conv1_weight_64_64_3_3.txt");
-    txtreader(kernel_info1, pathmult1);
-    cout << "kernel vector length = " << kernel_info1.size() << endl;
-    vector<vector<Ciphertext>> input(1, vector<Ciphertext>(64, ctxt_init));
-
-    timer.start("temp case start...");
     
-    convtemp = newConv(context, pack, eval, ecd, 32, 4, 1, 64, 64, input[0], kernel_info1, 3);
-    ctxt_conv0_out.push_back(convtemp);
+    ////////////////common path//////////////////////////////////
+    string common_path_mult = "/app/HEAAN-ResNet-110/resnet110/multiplicands/";
+    string common_path_sum = "/app/HEAAN-ResNet-110/resnet110/summands/";
+    ////////////////////////////////////////////////////////////
     
-    timer.end();
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    
-    // 0st conv
+    //// 0st conv ///
+    std::cout << "layer1 convolution .. " << std::endl;
+    vector<vector<Ciphertext>> layer2_block6_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
-
-    cout << " layer1 conv ... " << endl;
-    timer.start(" * ");
-
-    vector<vector<Ciphertext>> ctxt_block0conv0_out;
-    vector<Ciphertext> convtemp0(16, ctxt_init);
-
-    vector<double> kernel_info;
-    txtreader(kernel_info, path0);
-
-
-    for (int i=0; i<16; ++i){
-        convtemp0 = newConv(context, pack, eval, ecd, 32, 1, 1, 3, 16, imageVec[i], kernel_info, 3);
-        ctxt_block0conv0_out.push_back(convtemp0);
-    }
-
-    kernel_info.clear();
-    kernel_info.shrink_to_fit();
+    ctxt_block0relu0_out = Conv_first(timer, context, pack, eval, ecd, ctxt_init, ptxt_init , cnst, log_slots,
+        path0, path0a, imageVec);
     
-    vector<Plaintext> bias0(16, ptxt_init);
-    vector<double> temp0a;
-    Scaletxtreader(temp0a, path0a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
-        Message msg(log_slots, temp0a[i]);
-        bias0[i]=ecd.encode(msg, 4, 0);
-    }
-
-    temp0a.clear();
-    temp0a.shrink_to_fit();
-
-    addBNsummands(context, eval, ctxt_block0conv0_out, bias0, 16, 16);
-    timer.end();
-    cout << "DONE!\n";
-
-    imageVec.clear();
-    imageVec.shrink_to_fit();
-
-    bias0.clear();
-    bias0.shrink_to_fit();
-
-    ///////////////추가///////////////////
-    cout << "first conv result test..." << endl;
-    dec.decrypt(ctxt_block0conv0_out[0][0], sk, dmsg);
-    printMessage(dmsg);
-    //////////////////////////////////////
-
-    // // AppReLU
-    cout << "layer1 relu ...\n\n";
-    timer.start(" block0relu0 ");
-    vector<vector<Ciphertext>> ctxt_block0relu0_out(16, vector<Ciphertext>(16, ctxt_init)); //초기화부분 추가
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][i % 5], ctxt_block0relu0_out[i / 5][i % 5]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][(i%5)], ctxt_block0relu0_out[8+(i /5)][(i%5)]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][5+(i%5)], ctxt_block0relu0_out[i / 5][5+(i%5)]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][5+(i%5)], ctxt_block0relu0_out[8+(i /5)][5+(i%5)]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][10+(i%5)], ctxt_block0relu0_out[i / 5][10+(i%5)]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][10+(i%5)], ctxt_block0relu0_out[8+(i /5)][10+(i%5)]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
-        ApproxReLU(context, eval, ctxt_block0conv0_out[i][15], ctxt_block0relu0_out[i][15]);
-    }
-    timer.end();
-
-    
-    ctxt_block0conv0_out.clear();
-    ctxt_block0conv0_out.shrink_to_fit();
     cout << "DONE!, decrypted message is ... " << "\n";
-
     dec.decrypt(ctxt_block0relu0_out[0][0], sk, dmsg);
     printMessage(dmsg);
+    cout <<"\n";
+    
+    imageVec.clear();
+    imageVec.shrink_to_fit();
 
     cout << "layer1 DONE!\n" << "\n";
 
