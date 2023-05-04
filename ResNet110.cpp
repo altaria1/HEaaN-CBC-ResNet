@@ -9,16 +9,15 @@
 #include "HEaaN/heaan.hpp" 
 #include "examples.hpp" 
 #include "Conv.hpp"
-#include "Conv_parallel.hpp"
-#include "ReLUbundle.hpp"
+#include "AppReLU.hpp"
 #include "MPPacking.hpp"
 #include "HEaaNTimer.hpp"
-
 #include "convtools.hpp"
 #include "kernelEncode.hpp"
 #include "imageEncode.hpp"
 #include "AvgpoolFC64.hpp"
-#include "RBtools40.hpp"
+#include "RB.hpp"
+#include "DSB.hpp"
 
 namespace {
     using namespace HEaaN;
