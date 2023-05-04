@@ -23,6 +23,117 @@ namespace {
 }
 
 
+
+vector<vector<Ciphertext>> Conv_first(HEaaNTimer timer, Context context, KeyPack pack, HomEvaluator eval, EnDecoder ecd, 
+Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots, 
+string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
+
+    timer.start("1st layer conv ... ");
+    vector<double> temp0;
+    vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
+    Scaletxtreader(temp0, pathmult, cnst);
+
+    kernel_ptxt(context, temp0, block0conv0multiplicands16_3_3_3, 5, 1, 1, 16, 3, 3, ecd);
+
+    temp0.clear();
+    temp0.shrink_to_fit();
+
+    vector<Plaintext> block0conv0summands16(16, ptxt_init);
+    vector<double> temp0a;
+    Scaletxtreader(temp0a, pathsum, cnst);
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 16; ++i) {
+        {
+            Message msg(log_slots, temp0a[i]);
+            block0conv0summands16[i]=ecd.encode(msg, 4, 0);
+        }
+    }
+    temp0a.clear();
+    temp0a.shrink_to_fit();
+    
+    timer.end();
+    
+    // Convolution 0
+    cout << "block0conv0 ..." << endl;
+    timer.start(" block0conv0 ");
+    vector<vector<Ciphertext>> ctxt_block0conv0_out(16, vector<Ciphertext>(16, ctxt_init));
+    
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 16; ++i) { 
+        {
+            ctxt_block0conv0_out[i] = Conv(context, pack, eval, 32, 1, 1, 3, 16, input[i], block0conv0multiplicands16_3_3_3);
+        }
+    }
+
+    addBNsummands(context, eval, ctxt_block0conv0_out, block0conv0summands16, 16, 16);
+    timer.end();
+
+    imageVec.clear();
+    imageVec.shrink_to_fit();
+
+    cout <<"\n";
+
+    block0conv0multiplicands16_3_3_3.clear();
+    block0conv0multiplicands16_3_3_3.shrink_to_fit();
+    block0conv0summands16.clear();
+    block0conv0summands16.shrink_to_fit();
+
+    timer.start(" block0relu0 ");
+    vector<vector<Ciphertext>> ctxt_block0relu0_out(16, vector<Ciphertext>(16, ctxt_init)); 
+    
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][i % 5], ctxt_block0relu0_out[i / 5][i % 5]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][(i%5)], ctxt_block0relu0_out[8+(i /5)][(i%5)]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][5+(i%5)], ctxt_block0relu0_out[i / 5][5+(i%5)]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][5+(i%5)], ctxt_block0relu0_out[8+(i /5)][5+(i%5)]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[i / 5][10+(i%5)], ctxt_block0relu0_out[i / 5][10+(i%5)]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 40; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[8+(i /5)][10+(i%5)], ctxt_block0relu0_out[8+(i /5)][10+(i%5)]);
+    }
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < 16; ++i) {
+        ApproxReLU(context, eval, ctxt_block0conv0_out[i][15], ctxt_block0relu0_out[i][15]);
+    }
+
+    timer.end();
+    
+    ctxt_block0conv0_out.clear();
+    ctxt_block0conv0_out.shrink_to_fit();
+    cout << "DONE!, decrypted message is ... " << "\n";
+
+    dec.decrypt(ctxt_block0relu0_out[0][0], sk, dmsg);
+    printMessage(dmsg);
+
+    cout << "block0 DONE!\n" << "\n";
+    
+    return ctxt_block0relu0_out;
+}
+
+
+
+
 vector<vector<Ciphertext>> RB1(HEaaNTimer timer, Context context, KeyPack pack, HomEvaluator eval, EnDecoder ecd, 
 Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots, 
 string pathmult1, string pathsum1, string pathmult2, string pathsum2,
