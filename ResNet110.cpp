@@ -127,7 +127,7 @@ int main() {
     vector<vector<Ciphertext>> layer2_block6_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
-    ctxt_block0relu0_out = Conv_first(timer, context, pack, eval, ecd, ctxt_init, ptxt_init , cnst, log_slots,
+    ctxt_block0relu0_out = Conv_first(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots,
         path0, path0a, imageVec);
     
     cout << "DONE!, decrypted message is ... " << "\n";
@@ -488,385 +488,37 @@ int main() {
      // result save.
     cout << "saving layer2_RB18 ctxt_result_bundel.." << endl;
     string savepath4 = "/app/result/layer2_RB18/";
-    saveMsgBundle(dec, sk, layer2_block17_out,savepath4);    
+    saveMsgBundle(dec, sk, layer2_block17_out, savepath4);    
     cout << "done" << endl;   
 
-    ////////////DSB////////////////
-
-    // DSB 1 - res
-    cout << "DSB1 start...!" << endl;
-    cout << "uploading for DSB1_downsample_conv0 ...\n";
-    timer.start(" * ");
-    vector<double> temp7;
-    vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16_1_1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
-    string path19 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer3_0_downsample_weight_32_16_1_1.txt");
-    txtreader(temp7, path19);
-    kernel_ptxt(context, temp7, block4conv_onebyone_multiplicands32_16_1_1, 5, 1, 2, 32, 16, 1, ecd);
-    temp7.clear();
-    temp7.shrink_to_fit();
-
-
-    vector<Plaintext> block4conv_onebyone_summands32(32, ptxt_init);
-    vector<double> temp7a;
-    string path19a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer3_0_downsample_bias_32.txt");
-    Scaletxtreader(temp7a, path19a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        //#pragma omp parallel num_threads(2)
-        {
-        Message msg(log_slots, temp7a[i]);
-        block4conv_onebyone_summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp7a.clear();
-    temp7a.shrink_to_fit();
     
+    ////////////////////
+    /////// DSB1 ///////
+    ////////////////////
     
-    timer.end();
-
-    cout << "DSB1_conv_onebyone ..." << endl;
-    timer.start(" DSB1_conv_onebyone .. ");
-    cout << "convolution ...\n\n";
-    vector<vector<Ciphertext>> ctxt_block4conv_onebyone_out(16, vector<Ciphertext>(32, ctxt_init));
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) { // 서로 다른 img
-        //#pragma omp parallel num_threads(5)
-        {
-            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, layer2_block17_out[i], block4conv_onebyone_multiplicands32_16_1_1);
-        }
-    }
-
-
-    block4conv_onebyone_multiplicands32_16_1_1.clear();
-    block4conv_onebyone_multiplicands32_16_1_1.shrink_to_fit();
-
-
-    // MPP input bundle making
-    //cout << "block4MPP1 and BN summand ..." << endl;
-    cout << "MPPacking ... \n\n";
-    vector<vector<vector<Ciphertext>>> ctxt_block4MPP1_in(4, vector<vector<Ciphertext>>(32, vector<Ciphertext>(4, ctxt_init)));
-
-    #pragma omp parallel for collapse(3)
-    for (int i = 0; i < 4; ++i) {
-        for (int ch = 0; ch < 32; ++ch) {
-            for (int k = 0; k < 4; ++k) {
-                ctxt_block4MPP1_in[i][ch][k] = ctxt_block4conv_onebyone_out[4 * i + k][ch];
-            }
-        }
-    }
+    std::cout << "layer3_DSB1 .. " << std::endl;
+    vector<vector<Ciphertext>> layer3_block0_out;
     
-    ctxt_block4conv_onebyone_out.clear();
-    ctxt_block4conv_onebyone_out.shrink_to_fit();
-    
-    
-    // dec.decrypt(ctxt_block4MPP1_in[0][0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-
-    // MPP
-    vector<vector<Ciphertext>> ctxt_block4MPP1_out(4, vector<Ciphertext>(32, ctxt_init));
-
-    #pragma omp parallel for collapse(2) num_threads(40)
-    for (int i = 0; i < 4; ++i) {
-        for (int ch = 0; ch < 32; ++ch) {
-            ctxt_block4MPP1_out[i][ch] = MPPacking1(context, pack, eval, 32, ctxt_block4MPP1_in[i][ch]);
-        }
-    }
-
-    ctxt_block4MPP1_in.clear();
-    ctxt_block4MPP1_in.shrink_to_fit();
-    
-    // dec.decrypt(ctxt_block4MPP1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    addBNsummands(context, eval, ctxt_block4MPP1_out, block4conv_onebyone_summands32, 4, 32);
-    timer.end();
-
-    cout << "DONE!\n";
-
-    block4conv_onebyone_summands32.clear();
-    block4conv_onebyone_summands32.shrink_to_fit();
-    
-    
-
-    // cout << "Done!! level of ctxt is " << ctxt_block4MPP1_out[0][0].getLevel() << "\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block4MPP1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-
-    ///////////////////////// Main flow /////////////////////////////////////////
-
-
-    
-    // DSB 1 - 1
-    
-    cout << "uploading for DSB1_conv0 ...\n\n";
-    timer.start(" * ");
-    vector<double> temp8;
-    vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
-    string path19_1 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer3_0_conv1_weight_32_16_3_3.txt");
-    txtreader(temp8, path19_1);
-    kernel_ptxt(context, temp8, block4conv0multiplicands32_16_3_3, 5, 1, 2, 32, 16, 3, ecd);
-    temp8.clear();
-    temp8.shrink_to_fit();
-
-
-    vector<Plaintext> block4conv0summands32(32, ptxt_init);
-    vector<double> temp8a;
-    string path19_1a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer3_0_conv1_bias_32.txt");
-    Scaletxtreader(temp8a, path19_1a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        //#pragma omp parallel num_threads(2)
-        {
-        Message msg(log_slots, temp8a[i]);
-        block4conv0summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp8a.clear();
-    temp8a.shrink_to_fit();
-    
-    timer.end();
-
-    cout << "DSB1_conv0 ..." << endl;
-    timer.start(" DSB1_conv0 ");
-    cout <<"convolution ...\n\n";
-    vector<vector<Ciphertext>> ctxt_block4conv0_out(16, vector<Ciphertext>(32, ctxt_init));
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) { // 서로 다른 img
-        //#pragma omp parallel num_threads(5)
-        {
-            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, layer2_block17_out[i], block4conv0multiplicands32_16_3_3);
-        }
-    }
-
-    layer2_block17_out.clear();
-    layer2_block17_out.shrink_to_fit();
-
-    block4conv0multiplicands32_16_3_3.clear();
-    block4conv0multiplicands32_16_3_3.shrink_to_fit();
-
-    // cout << "Done!! level of ctxt is " << ctxt_block4conv0_out[0][0].getLevel() << "\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block4conv0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-
-    // MPP input bundle making
-    cout << "MPPacking ...\n" << endl;
-    vector<vector<vector<Ciphertext>>> ctxt_block4MPP0_in(4, vector<vector<Ciphertext>>(32, vector<Ciphertext>(4, ctxt_init)));
-    #pragma omp parallel for collapse(3)
-    for (int i = 0; i < 4; ++i) {
-        for (int ch = 0; ch < 32; ++ch) {
-            for (int k = 0; k < 4; ++k) {
-                ctxt_block4MPP0_in[i][ch][k] = ctxt_block4conv0_out[4 * i + k][ch];
-            }
-        }
-    }
-    
-    // dec.decrypt(ctxt_block4MPP0_in[0][0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    ctxt_block4conv0_out.clear();
-    ctxt_block4conv0_out.shrink_to_fit();
-
-    // MPP
-    vector<vector<Ciphertext>> ctxt_block4MPP0_out(4, vector<Ciphertext>(32, ctxt_init));
-
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < 4; ++i) {
-        for (int ch = 0; ch < 32; ++ch) {
-            ctxt_block4MPP0_out[i][ch] = MPPacking1(context, pack, eval, 32, ctxt_block4MPP0_in[i][ch]);
-        }
-    }
-
-    ctxt_block4MPP0_in.clear();
-    ctxt_block4MPP0_in.shrink_to_fit();
-    
-    // dec.decrypt(ctxt_block4MPP0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    addBNsummands(context, eval, ctxt_block4MPP0_out, block4conv0summands32, 4, 32);
-    timer.end();
-
-    block4conv0summands32.clear();
-    block4conv0summands32.shrink_to_fit();
-
-    cout << "Done!! \n" ;
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block4MPP0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    // ctxt_block4MPP0_out 첫번째 : 서로 다른 img, 두번째 : ch.
-
-    // AppReLU
-    cout << "DSB1_relu0 ..." << endl;
-    timer.start(" DSB1_relu0 ");
-    vector<vector<Ciphertext>> ctxt_block4relu0_out(4, vector<Ciphertext>(32, ctxt_init));
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4MPP0_out[i / 10][i % 10], ctxt_block4relu0_out[i / 10][i % 10]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4MPP0_out[i / 10][10+(i % 10)], ctxt_block4relu0_out[i / 10][10+(i % 10)]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4MPP0_out[i / 10][20+(i % 10)], ctxt_block4relu0_out[i / 10][20+(i % 10)]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 8; ++i) {
-        #pragma omp parallel num_threads(5)
-        {
-            ApproxReLU(context, eval, ctxt_block4MPP0_out[i / 2][30+(i %2)], ctxt_block4relu0_out[i / 2][30+ (i% 2)]);
-        }
-    }
-
-
-
-    timer.end();
-
-    ctxt_block4MPP0_out.clear();
-    ctxt_block4MPP0_out.shrink_to_fit();
-
-    cout << "DONE!\n" << "\n";
-    
-    
-
-    //dec.decrypt(ctxt_block4relu0_out[0][0], sk, dmsg);
-    //printMessage(dmsg);
-
-    // Second convolution
-
-      // DSB 1 - 2
-    
-    cout << "uploading for DSB1_conv1 ...\n\n";
-    timer.start(" * ");
-    vector<double> temp9;
-    vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-    string path19_2 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer3_0_conv2_weight_32_32_3_3.txt");
-    txtreader(temp9, path19_2);
-    kernel_ptxt(context, temp9, block4conv1multiplicands32_32_3_3, 5, 2, 1, 32, 32, 3, ecd);
-    temp9.clear();
-    temp9.shrink_to_fit();
-
-
-    vector<Plaintext> block4conv1summands32(32, ptxt_init);
-    vector<double> temp9a;
-    string path19_2a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer3_0_conv2_bias_32.txt");
-    Scaletxtreader(temp9a, path19_2a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        //#pragma omp parallel num_threads(2)
-        {
-        Message msg(log_slots, temp9a[i]);
-        block4conv1summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp9a.clear();
-    temp9a.shrink_to_fit();
-    
-    timer.end();
-
-    cout << "DSB1_conv1 ..." << endl;
-    timer.start(" DSB1_conv1 ");
-    vector<vector<Ciphertext>> ctxt_block4conv1_out(4, vector<Ciphertext>(32, ctxt_init));
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 4; ++i) {
-        #pragma omp parallel num_threads(10)
-        {
-            ctxt_block4conv1_out[i] = Conv(context, pack, eval, 32, 2, 1, 32, 32, ctxt_block4relu0_out[i], block4conv1multiplicands32_32_3_3);
-        }
-    }
-
-    addBNsummands(context, eval, ctxt_block4conv1_out, block4conv1summands32, 4, 32);
-    timer.end();
-
-    ctxt_block4relu0_out.clear();
-    ctxt_block4relu0_out.shrink_to_fit();
-
-    block4conv1multiplicands32_32_3_3.clear();
-    block4conv1multiplicands32_32_3_3.shrink_to_fit();
-    block4conv1summands32.clear();
-    block4conv1summands32.shrink_to_fit();
-
-    cout << "Done!!\n" << "\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block4conv1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    
-
-
-
-    //////////////////////////// Main flow + Residual flow //////////////////////////////////
-    cout << "DSB1_add..." << endl;
-    vector<vector<Ciphertext>> ctxt_block4add_out(4, vector<Ciphertext>(32, ctxt_init));
-
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < 4; ++i) {
-        for (int ch = 0; ch < 32; ++ch) {
-            eval.add(ctxt_block4conv1_out[i][ch], ctxt_block4MPP1_out[i][ch], ctxt_block4add_out[i][ch]);
-        }
-    }
-
-    ctxt_block4conv1_out.clear();
-    ctxt_block4conv1_out.shrink_to_fit();
-    ctxt_block4MPP1_out.clear();
-    ctxt_block4MPP1_out.shrink_to_fit();
-
-
-    // Last AppReLU
-    cout << "DSB1_relu1 ..." << endl;
-    timer.start(" DSB1_relu1 ");
-    vector<vector<Ciphertext>> ctxt_block4relu1_out(4, vector<Ciphertext>(32, ctxt_init));
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4add_out[i / 10][i % 10], ctxt_block4relu1_out[i / 10][i % 10]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4add_out[i / 10][10+(i % 10)], ctxt_block4relu1_out[i / 10][10+(i % 10)]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block4add_out[i / 10][20+(i % 10)], ctxt_block4relu1_out[i / 10][20+(i % 10)]);
-    }
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 8; ++i) {
-        #pragma omp parallel num_threads(5)
-        {
-            ApproxReLU(context, eval, ctxt_block4add_out[i / 2][30+(i %2)], ctxt_block4relu1_out[i / 2][30+ (i% 2)]);
-        }
-    }
-
-
-
-    timer.end();
-
-    ctxt_block4add_out.clear();
-    ctxt_block4add_out.shrink_to_fit();
+    string path19 = common_path_mult + string("layer3_0_downsample_weight_32_16_1_1.txt");
+    string path19a = common_path_sum + string("layer3_0_downsample_bias_32.txt");
+    string path19_2 = common_path_mult + string("layer3_0_conv1_weight_32_16_3_3.txt");
+    string path19_2a = common_path_sum + string("layer3_0_conv1_bias_32.txt");
+    string path19_3 = common_path_mult + string("layer3_0_conv2_weight_32_32_3_3.txt");
+    string path19_3a = common_path_sum + string("layer3_0_conv2_bias_32.txt");
+    layer3_block0_out = DSB1(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, 
+                                path19, path19a, path19_2, path19_2a, path19_3, path19_3a, layer2_block17_out);
     
     cout << "DONE!, decrypted message is ... " << "\n";
-    dec.decrypt(ctxt_block4relu1_out[0][0], sk, dmsg);
+    dec.decrypt(layer3_block0_out[0][0], sk, dmsg);
     printMessage(dmsg);
-    cout << "Downsampling block19 DONE!" << "\n";
+    cout <<"\n";
 
      // result save.
     cout << "saving DSB1 ctxt_result_bundel.." << endl;
     string savepath5 = "/app/result/DSB1/";
-    saveMsgBundle(dec, sk, ctxt_block4relu1_out,savepath5);    
+    saveMsgBundle(dec, sk, layer3_block0_out, savepath5);    
     cout << "done" << endl;   
+    
 
     //////////RB20///////////////
     std::cout << "layer3_RB1 .. " << std::endl;
@@ -876,7 +528,7 @@ int main() {
     string path20_2 = common_path_mult + string("layer3_1_conv2_weight_32_32_3_3.txt");
     string path20_2a = common_path_sum + string("layer3_1_conv2_bias_32.txt");
     layer3_block1_out = RB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init , cnst, log_slots,
-        path20, path20a, path20_2, path20_2a, ctxt_block4relu1_out);
+        path20, path20a, path20_2, path20_2a, layer3_block0_out);
     
     cout << "DONE!, decrypted message is ... " << "\n";
     dec.decrypt(layer3_block1_out[0][0], sk, dmsg);
@@ -886,6 +538,7 @@ int main() {
     ctxt_block4relu1_out.clear();
     ctxt_block4relu1_out.shrink_to_fit();
 
+    
     //////////RB21///////////////
     std::cout << "layer3_RB2 .. " << std::endl;
     vector<vector<Ciphertext>> layer3_block2_out;
@@ -1181,7 +834,7 @@ int main() {
     string path36a = common_path_sum + string("layer3_17_conv1_bias_32.txt");
     string path36_2 = common_path_mult + string("layer3_17_conv2_weight_32_32_3_3.txt");
     string path36_2a = common_path_sum + string("layer3_17_conv2_bias_32.txt");
-    layer3_block17_out = RB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init , cnst, log_slots,
+    layer3_block17_out = RB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots,
         path36, path36a, path36_2, path36_2a, layer3_block16_out);
     
     cout << "DONE!, decrypted message is ... " << "\n";
@@ -1198,331 +851,27 @@ int main() {
     saveMsgBundle(dec, sk, layer3_block17_out,savepath9);    
     cout << "done" << endl; 
 
-    ////////////////////////
-    /////// DSB 2 //////////
-    /////////////////////////
+    ////////////////////
+    /////// DSB2 ///////
+    ////////////////////
     
-     ///////////////////// Residual flow ////////////////////////////
-    // Convolution
-
+    std::cout << "layer4_DSB2 .. " << std::endl;
+    vector<vector<Ciphertext>> ctxt_block7relu1_out;
     
-    cout << "uploading for DSB2_conv_onebyone ...\n\n";
-    timer.start(" * ");
-    vector<double> temp14;
-    vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
-    string path37 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer4_0_downsample_weight_64_32_1_1.txt");
-    txtreader(temp14, path37);
-    kernel_ptxt(context, temp14, block7conv_onebyone_multiplicands64_32_1_1, 5, 2, 2, 64, 32, 1, ecd);
-    temp14.clear();
-    temp14.shrink_to_fit();
-
-    vector<Plaintext> block7conv_onebyone_summands64(64, ptxt_init);
-    vector<double> temp14a;
-    string path37a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer4_0_downsample_bias_64.txt");
-    Scaletxtreader(temp14a, path37a, cnst);
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 64; ++i) {
-        Message msg(log_slots, temp14a[i]);
-        block7conv_onebyone_summands64[i]=ecd.encode(msg, 4, 0);
-    }
-    temp14a.clear();
-    temp14a.shrink_to_fit();
+    string path37 = common_path_mult + string("layer4_0_downsample_weight_64_32_1_1.txt");
+    string path37a = common_path_sum + string("layer4_0_downsample_bias_64.txt");
+    string path37_2 = common_path_mult + string("layer4_0_conv1_weight_64_32_3_3.txt");
+    string path37_2a = common_path_sum + string("layer4_0_conv1_bias_64.txt");
+    string path37_3 = common_path_mult + string("layer4_0_conv2_weight_64_64_3_3.txt");
+    string path37_3a = common_path_sum + string("layer4_0_conv2_bias_64.txt");
     
-    timer.end();
-
-    cout << "DSB2_conv_onebyone ..." << endl;
-    timer.start(" DSB2_conv_onebyone .. ");
-    cout << "convolution ...\n\n";
-    vector<vector<Ciphertext>> ctxt_block7conv_onebyone_out(4, vector<Ciphertext>(64, ctxt_init));
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 4; ++i) { // 서로 다른 img
-        #pragma omp parallel num_threads(10)
-        {
-            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, layer3_block17_out[i], block7conv_onebyone_multiplicands64_32_1_1);
-        }
-    }
-
-
-    block7conv_onebyone_multiplicands64_32_1_1.clear();
-    block7conv_onebyone_multiplicands64_32_1_1.shrink_to_fit();
-
-    cout << "Done!! \n" << "\n";
-    // cout << "and decrypted message is ... " << "\n";
-    // dec.decrypt(ctxt_block7conv_onebyone_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    // MPP input bundle making
-    cout << "MPPacking ..." << endl;
-    vector<vector<vector<Ciphertext>>> ctxt_block7MPP1_in(1, vector<vector<Ciphertext>>(64, vector<Ciphertext>(4, ctxt_init)));
-
-    #pragma omp parallel for collapse(3)
-    for (int i = 0; i < 1; ++i) {
-        for (int ch = 0; ch < 64; ++ch) {
-            for (int k = 0; k < 4; ++k) {
-                ctxt_block7MPP1_in[i][ch][k] = ctxt_block7conv_onebyone_out[4 * i + k][ch];
-            }
-        }
-    }
-    ctxt_block7conv_onebyone_out.clear();
-    ctxt_block7conv_onebyone_out.shrink_to_fit();
+    ctxt_block7relu1_out = DSB2(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots, 
+                                path37, path37a, path37_2, path37_2a, path37_3, path37_3a, layer3_block17_out);
     
-    
-    // dec.decrypt(ctxt_block7MPP1_in[0][0][0], sk, dmsg);
-    // printMessage(dmsg);
-    
-    // MPP
-    vector<vector<Ciphertext>> ctxt_block7MPP1_out(1, vector<Ciphertext>(64, ctxt_init));
-
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < 1; ++i) {
-        for (int ch = 0; ch < 64; ++ch) {
-            ctxt_block7MPP1_out[i][ch] = MPPacking2(context, pack, eval, 32, ctxt_block7MPP1_in[i][ch]);
-        }
-    }
-
-    ctxt_block7MPP1_in.clear();
-    ctxt_block7MPP1_in.shrink_to_fit();
-    
-    
-    // dec.decrypt(ctxt_block7MPP1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    addBNsummands(context, eval, ctxt_block7MPP1_out, block7conv_onebyone_summands64, 1, 64);
-    timer.end();
-
-    block7conv_onebyone_summands64.clear();
-    block7conv_onebyone_summands64.shrink_to_fit();
-
-    cout << "Done!! \n" << "\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block7MPP1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-    
-    
-    
-    
-
-
-    ///////////////////////// Main flow /////////////////////////////////////////
-   
-    
-    cout << "uploading for DSB2_conv0 ...\n\n";
-    timer.start(" * ");
-
-    vector<double> temp15;
-    vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-    string path37_1 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer4_0_conv1_weight_64_32_3_3.txt");
-    txtreader(temp15, path37_1);
-    kernel_ptxt(context, temp15, block7conv0multiplicands64_32_3_3, 5, 2, 2, 64, 32, 3, ecd);
-    temp15.clear();
-    temp15.shrink_to_fit();
-
-
-    vector<Plaintext> block7conv0summands64(64, ptxt_init);
-    vector<double> temp15a;
-    string path37_1a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer4_0_conv1_bias_64.txt");
-    Scaletxtreader(temp15a, path37_1a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 64; ++i) {
-        Message msg(log_slots, temp15a[i]);
-        block7conv0summands64[i]=ecd.encode(msg, 4, 0);
-    }
-    temp15a.clear();
-    temp15a.shrink_to_fit();
-    
-    timer.end();
-
-    cout << "DSB2_conv0 ..." << endl;
-    timer.start(" DSB2_conv0 ");
-    cout << "convolution ... \n\n";
-    vector<vector<Ciphertext>> ctxt_block7conv0_out(4, vector<Ciphertext>(64, ctxt_init));
-    for (int i = 0; i < 4; ++i) { // 서로 다른 img
-        ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, layer3_block17_out[i], block7conv0multiplicands64_32_3_3);
-    }
-
-    layer3_block17_out.clear();
-    layer3_block17_out.shrink_to_fit();
-
-    block7conv0multiplicands64_32_3_3.clear();
-    block7conv0multiplicands64_32_3_3.shrink_to_fit();
-
-    // cout << "Done!! level of ctxt is " << ctxt_block7conv0_out[0][0].getLevel() << "\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block7conv0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-
-    // MPP input bundle making
-    cout << "MPpacking ..." << endl;
-    vector<vector<vector<Ciphertext>>> ctxt_block7MPP0_in(1, vector<vector<Ciphertext>>(64, vector<Ciphertext>(4, ctxt_init)));
-    #pragma omp parallel for collapse(3)
-    for (int i = 0; i < 1; ++i) {
-        for (int ch = 0; ch < 64; ++ch) {
-            for (int k = 0; k < 4; ++k) {
-                ctxt_block7MPP0_in[i][ch][k] = ctxt_block7conv0_out[4 * i + k][ch];
-            }
-        }
-    }
-    
-    
-    // dec.decrypt(ctxt_block7MPP0_in[0][0][0], sk, dmsg);
-    // printMessage(dmsg);
-    
-
-    ctxt_block7conv0_out.clear();
-    ctxt_block7conv0_out.shrink_to_fit();
-
-    // MPP
-    vector<vector<Ciphertext>> ctxt_block7MPP0_out(1, vector<Ciphertext>(64, ctxt_init));
-
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < 1; ++i) {
-        for (int ch = 0; ch < 64; ++ch) {
-            ctxt_block7MPP0_out[i][ch] = MPPacking2(context, pack, eval, 32, ctxt_block7MPP0_in[i][ch]);
-        }
-    }
-
-    ctxt_block7MPP0_in.clear();
-    ctxt_block7MPP0_in.shrink_to_fit();
-    
-    // dec.decrypt(ctxt_block7MPP0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-    
-    addBNsummands(context, eval, ctxt_block7MPP0_out, block7conv0summands64, 1, 64);
-    timer.end();
-
-    block7conv0summands64.clear();
-    block7conv0summands64.shrink_to_fit();
-
-    cout << "Done!! \n\n";
-    // cout << "and decrypted messagee is ... " << "\n";
-    // dec.decrypt(ctxt_block7MPP0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    // ctxt_block7MPP0_out 첫번째 : 서로 다른 img, 두번째 : ch.
-
-    // AppReLU
-    cout << "DSB2_relu0 ..." << endl;
-    timer.start(" DSB2_relu0 ");
-    vector<vector<Ciphertext>> ctxt_block7relu0_out(1, vector<Ciphertext>(64, ctxt_init));
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block7MPP0_out[0][i], ctxt_block7relu0_out[0][i]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        ApproxReLU(context, eval, ctxt_block7MPP0_out[0][i], ctxt_block7relu0_out[0][i]);
-    }
-
-    timer.end();
-
-    ctxt_block7MPP0_out.clear();
-    ctxt_block7MPP0_out.shrink_to_fit();
-
-    cout << "DONE!" << "\n";
-
-    // dec.decrypt(ctxt_block7relu0_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-    
-    
- // Second convolution
-    
-    
-    cout << "uploading for DSB2_conv1 ...\n\n";
-    timer.start(" * ");
-
-    vector<double> temp16;
-    vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    string path37_2 = "/app/HEAAN-ResNet-110/resnet110/multiplicands/" + string("layer4_0_conv2_weight_64_64_3_3.txt");
-    txtreader(temp16, path37_2);
-    kernel_ptxt(context, temp16, block7conv1multiplicands64_64_3_3, 5, 4, 1, 64, 64, 3, ecd);
-    temp16.clear();
-    temp16.shrink_to_fit();
-
-    vector<Plaintext> block7conv1summands64(64, ptxt_init);
-    vector<double> temp16a;
-    string path37_2a = "/app/HEAAN-ResNet-110/resnet110/summands/" + string("layer4_0_conv2_bias_64.txt");
-    Scaletxtreader(temp16a, path37_2a, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 64; ++i) {
-        Message msg(log_slots, temp16a[i]);
-        block7conv1summands64[i]=ecd.encode(msg, 4, 0);
-    }
-
-    temp16a.clear();
-    temp16a.shrink_to_fit();
-    
-    timer.end();
-    cout << "DSB2_conv1 ..." << endl;
-    timer.start(" DSB2_conv1 ");
-    vector<vector<Ciphertext>> ctxt_block7conv1_out(1, vector<Ciphertext>(64, ctxt_init));
-    for (int i = 0; i < 1; ++i) {
-        ctxt_block7conv1_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, ctxt_block7relu0_out[i], block7conv1multiplicands64_64_3_3);
-    }
-
-    addBNsummands(context, eval, ctxt_block7conv1_out, block7conv1summands64, 1, 64);
-    timer.end();
-
-    ctxt_block7relu0_out.clear();
-    ctxt_block7relu0_out.shrink_to_fit();
-
-    block7conv1multiplicands64_64_3_3.clear();
-    block7conv1multiplicands64_64_3_3.shrink_to_fit();
-    block7conv1summands64.clear();
-    block7conv1summands64.shrink_to_fit();
-
-    cout << "Done!! \n\n";
-    // cout << "and decrypted message is ... " << "\n";
-    // dec.decrypt(ctxt_block7conv1_out[0][0], sk, dmsg);
-    // printMessage(dmsg);
-
-
-    
-
-
-    //////////////////////////// Main flow + Residual flow //////////////////////////////////
-    cout << "DSB2_add ..." << endl;
-    vector<vector<Ciphertext>> ctxt_block7add_out(1, vector<Ciphertext>(64, ctxt_init));
-
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < 1; ++i) {
-        for (int ch = 0; ch < 64; ++ch) {
-            eval.add(ctxt_block7conv1_out[i][ch], ctxt_block7MPP1_out[i][ch], ctxt_block7add_out[i][ch]);
-        }
-    }
-
-    ctxt_block7conv1_out.clear();
-    ctxt_block7conv1_out.shrink_to_fit();
-    ctxt_block7MPP1_out.clear();
-    ctxt_block7MPP1_out.shrink_to_fit();
-
-    cout << "DONE!" << "\n";
-
-    // Last AppReLU
-    cout << "DSB2_relu1 ..." << endl;
-    timer.start(" DSB2_relu1 ");
-    vector<vector<Ciphertext>> ctxt_block7relu1_out(1, vector<Ciphertext>(64, ctxt_init));
-
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        ApproxReLU(context, eval, ctxt_block7add_out[0][i], ctxt_block7relu1_out[0][i]);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        ApproxReLU(context, eval, ctxt_block7add_out[0][i], ctxt_block7relu1_out[0][i]);
-    }
-
-    timer.end();
-
-    ctxt_block7add_out.clear();
-    ctxt_block7add_out.shrink_to_fit();
-    cout << "DONE!, decrypted message is ...\n\n";
+    cout << "DONE!, decrypted message is ... " << "\n";
     dec.decrypt(ctxt_block7relu1_out[0][0], sk, dmsg);
     printMessage(dmsg);
-    cout << "downsampling DSB2 DONE!" << "\n";
+    cout <<"\n";
 
       // result save.
     cout << "saving DSB2 ctxt_result_bundel.." << endl;
@@ -1865,10 +1214,11 @@ int main() {
     cout << "done" << endl;
     
 
+    /////////////////////////////////////
+    //////////// Avg Pool //////////////
+    ////////////////////////////////////
     
-
-
-    // Avg Pool
+  
     cout << "evaluating Avgpool" << "\n";
     vector<Ciphertext> ctxt_avgp_out;
     timer.start(" avgpool * ");
