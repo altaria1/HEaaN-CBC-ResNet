@@ -95,7 +95,7 @@ int main() {
 
     int num;
     
-    cout << "10000 test image encoding; choose one of bundle from 1 to 20 \n;
+    cout << "10000 test image encoding; choose one of bundle from 1 to 20 \n";
     cin >> num;
 
     vector<vector<Ciphertext>> imageVec(16, vector<Ciphertext>(3, ctxt_zero));
