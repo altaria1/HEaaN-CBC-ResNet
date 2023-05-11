@@ -147,7 +147,7 @@ u64 level, u64 gap_in, u64 stride, const int out_ch, const int in_ch, const int 
     Scaletxtreader(temp0a, pathsum, cnst);
 
     #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < out_ch; ++i) {
         {
             Message msg(log_slots, temp0a[i]);
             bias[i]=ecd.encode(msg, 4, 0);
