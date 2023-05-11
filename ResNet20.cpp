@@ -126,7 +126,7 @@ int main() {
     
     //// 0st conv ///
     std::cout << "layer1 convolution .. " << std::endl;
-    vector<vector<Ciphertext>> layer2_block6_out;
+    vector<vector<Ciphertext>> ctxt_block0relu0_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
     ctxt_block0relu0_out = Conv_first(timer, context, pack, eval, ecd, ctxt_init, ptxt_init , cnst, log_slots,
