@@ -66,9 +66,6 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     addBNsummands(context, eval, ctxt_block0conv0_out, block0conv0summands16, 16, 16);
     timer.end();
 
-    imageVec.clear();
-    imageVec.shrink_to_fit();
-
     cout <<"\n";
 
     block0conv0multiplicands16_3_3_3.clear();
@@ -120,11 +117,6 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     
     ctxt_block0conv0_out.clear();
     ctxt_block0conv0_out.shrink_to_fit();
-    cout << "DONE!, decrypted message is ... " << "\n";
-
-    dec.decrypt(ctxt_block0relu0_out[0][0], sk, dmsg);
-    printMessage(dmsg);
-
     cout << "block0 DONE!\n" << "\n";
     
     return ctxt_block0relu0_out;
@@ -957,7 +949,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv_onebyone_multiplicands32_16_1_1);
+            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv_onebyone_multiplicands32_16_1_1);
         }
     }
 
@@ -1041,12 +1033,12 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv0multiplicands32_16_3_3);
+            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv0multiplicands32_16_3_3);
         }
     }
 
-    ctxt_block3relu1_out.clear();
-    ctxt_block3relu1_out.shrink_to_fit();
+    input.clear();
+    input.shrink_to_fit();
 
     block4conv0multiplicands32_16_3_3.clear();
     block4conv0multiplicands32_16_3_3.shrink_to_fit();
@@ -1229,12 +1221,6 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4add_out.clear();
     ctxt_block4add_out.shrink_to_fit();
     
-    cout << "DONE!, decrypted message is ... " << "\n";
-
-    dec.decrypt(ctxt_block4relu1_out[0][0], sk, dmsg);
-    printMessage(dmsg);
-    cout << "layer3 Downsampling block DONE!" << "\n";
-    
     return ctxt_block4relu1_out;
     
 }
@@ -1289,7 +1275,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     for (int i = 0; i < 4; ++i) {
         #pragma omp parallel num_threads(10)
         {
-            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv_onebyone_multiplicands64_32_1_1);
+            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, input[i], block7conv_onebyone_multiplicands64_32_1_1);
         }
     }
 
@@ -1369,8 +1355,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
         ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv0multiplicands64_32_3_3);
     }
 
-    ctxt_block6relu1_out.clear();
-    ctxt_block6relu1_out.shrink_to_fit();
+    input.clear();
+    input.shrink_to_fit();
 
     block7conv0multiplicands64_32_3_3.clear();
     block7conv0multiplicands64_32_3_3.shrink_to_fit();
@@ -1386,7 +1372,6 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
             }
         }
     }
-    
 
     ctxt_block7conv0_out.clear();
     ctxt_block7conv0_out.shrink_to_fit();
@@ -1441,7 +1426,6 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     vector<double> temp16;
     vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     txtreader(temp16, pathmult2);
-    
     {
         kernel_ptxt(context, temp16, block7conv1multiplicands64_64_3_3, 5, 4, 1, 64, 64, 3, ecd);
     }
