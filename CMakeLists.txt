@@ -48,11 +48,11 @@ find_package(HEaaN REQUIRED)
 ## add_executable(oddLazyBSGS oddLazyBSGStest.cpp) 
 ## target_link_libraries(oddLazyBSGS PUBLIC HEaaN::HEaaN)
 
-add_executable(load temptest110.cpp) 
-target_link_libraries(load PUBLIC HEaaN::HEaaN)
+add_executable(20 ResNet20.cpp) 
+target_link_libraries(20 PUBLIC HEaaN::HEaaN)
 
-add_executable(inference Inference110.cpp) 
-target_link_libraries(inference PUBLIC HEaaN::HEaaN)
+add_executable(110 ResNet110.cpp) 
+target_link_libraries(110 PUBLIC HEaaN::HEaaN)
 
 ## add_executable(relubundle ReLUbundletest.cpp) 
 ## target_link_libraries(relubundle PUBLIC HEaaN::HEaaN)
