@@ -26,28 +26,34 @@ Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots,
 string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
 
     timer.start("1st layer conv ... ");
-    vector<double> temp0;
+
     vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
-    Scaletxtreader(temp0, pathmult, cnst);
-
-    kernel_ptxt(context, temp0, block0conv0multiplicands16_3_3_3, 5, 1, 1, 16, 3, 3, ecd);
-
-    temp0.clear();
-    temp0.shrink_to_fit();
-
     vector<Plaintext> block0conv0summands16(16, ptxt_init);
-    vector<double> temp0a;
-    Scaletxtreader(temp0a, pathsum, cnst);
 
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
-        {
-            Message msg(log_slots, temp0a[i]);
-            block0conv0summands16[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp0a.clear();
-    temp0a.shrink_to_fit();
+    kernelEncode(context, pathmult, pathsum, block0conv0multiplicands16_3_3_3, block0conv0summands16, 5, 1, 1, 16, 3, 3, ecd);
+
+    // vector<double> temp0;
+    // vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
+    // Scaletxtreader(temp0, pathmult, cnst);
+
+    // kernel_ptxt(context, temp0, block0conv0multiplicands16_3_3_3, 5, 1, 1, 16, 3, 3, ecd);
+
+    // temp0.clear();
+    // temp0.shrink_to_fit();
+
+    // vector<Plaintext> block0conv0summands16(16, ptxt_init);
+    // vector<double> temp0a;
+    // Scaletxtreader(temp0a, pathsum, cnst);
+
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 16; ++i) {
+    //     {
+    //         Message msg(log_slots, temp0a[i]);
+    //         block0conv0summands16[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
+    // temp0a.clear();
+    // temp0a.shrink_to_fit();
     
     timer.end();
     
@@ -65,6 +71,9 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
 
     addBNsummands(context, eval, ctxt_block0conv0_out, block0conv0summands16, 16, 16);
     timer.end();
+
+    imageVec.clear();
+    imageVec.shrink_to_fit();
 
     cout <<"\n";
 
@@ -117,6 +126,11 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     
     ctxt_block0conv0_out.clear();
     ctxt_block0conv0_out.shrink_to_fit();
+    cout << "DONE!, decrypted message is ... " << "\n";
+
+    dec.decrypt(ctxt_block0relu0_out[0][0], sk, dmsg);
+    printMessage(dmsg);
+
     cout << "block0 DONE!\n" << "\n";
     
     return ctxt_block0relu0_out;
@@ -133,27 +147,32 @@ vector<vector<Ciphertext>>& input){
    // 1st conv
     cout << "uploading for conv0 ...\n";
     timer.start(" * ");
-    vector<double> temp1;
-    vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp1, pathmult1);
-    kernel_ptxt(context, temp1, kernel1, 5, 1, 1, 16, 16, 3, ecd);
-    temp1.clear();
-    temp1.shrink_to_fit();
 
+    vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum1(16, ptxt_init);
-    vector<double> temp1a;
-    Scaletxtreader(temp1a, pathsum1, cnst);
+
+    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, 5, 1, 1, 16, 16, 3, ecd);
+    // vector<double> temp1;
+    // vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp1, pathmult1);
+    // kernel_ptxt(context, temp1, kernel1, 5, 1, 1, 16, 16, 3, ecd);
+    // temp1.clear();
+    // temp1.shrink_to_fit();
+
+    // vector<Plaintext> BNsum1(16, ptxt_init);
+    // vector<double> temp1a;
+    // Scaletxtreader(temp1a, pathsum1, cnst);
     
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
-        //#pragma omp parallel num_threads(5)
-        {
-        Message msg(log_slots, temp1a[i]);
-        BNsum1[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp1a.clear();
-    temp1a.shrink_to_fit();
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 16; ++i) {
+    //     //#pragma omp parallel num_threads(5)
+    //     {
+    //     Message msg(log_slots, temp1a[i]);
+    //     BNsum1[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
+    // temp1a.clear();
+    // temp1a.shrink_to_fit();
     
     timer.end();
 
@@ -237,25 +256,31 @@ vector<vector<Ciphertext>>& input){
 
     cout<< "uploading for conv1 ...\n";
     timer.start(" * ");
-    vector<double> temp2;
+
     vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp2, pathmult2);
-    kernel_ptxt(context, temp2, kernel2, 5, 1, 1, 16, 16, 3, ecd);
-    temp2.clear();
-    temp2.shrink_to_fit();
-
     vector<Plaintext> BNsum2(16, ptxt_init);
-    vector<double> temp2a;
-    Scaletxtreader(temp2a, pathsum2, cnst);
-    
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 16; ++i) {
-        Message msg(log_slots, temp2a[i]);
-        BNsum2[i] = ecd.encode(msg, 4, 0);
-    }
 
-    temp2a.clear();
-    temp2a.shrink_to_fit();
+    kernelEncode(contextm pathmult2, pathsum2, kernel2, BNsum2, 5, 1, 1, 16, 16, 3, ecd);
+
+    // vector<double> temp2;
+    // vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp2, pathmult2);
+    // kernel_ptxt(context, temp2, kernel2, 5, 1, 1, 16, 16, 3, ecd);
+    // temp2.clear();
+    // temp2.shrink_to_fit();
+
+    // vector<Plaintext> BNsum2(16, ptxt_init);
+    // vector<double> temp2a;
+    // Scaletxtreader(temp2a, pathsum2, cnst);
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 16; ++i) {
+    //     Message msg(log_slots, temp2a[i]);
+    //     BNsum2[i] = ecd.encode(msg, 4, 0);
+    // }
+
+    // temp2a.clear();
+    // temp2a.shrink_to_fit();
     
     
     timer.end();
@@ -273,6 +298,7 @@ vector<vector<Ciphertext>>& input){
     }
 
     addBNsummands(context, eval, ctxt_conv1_out, BNsum2, 16, 16);
+
     timer.end();
     cout << "DONE!" << "\n";
 
@@ -366,30 +392,35 @@ vector<vector<Ciphertext>>& input){
 
     cout << "uploading for conv0 ...\n";
     timer.start(" * ");
-    vector<double> temp10;
+
     vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp10, pathmult1);
-    kernel_ptxt(context, temp10, kernel1, 5, 2, 1, 32, 32, 3, ecd);
-    temp10.clear();
-    temp10.shrink_to_fit();
-
-
     vector<Plaintext> BNsum1(32, ptxt_init);
-    vector<double> temp10a;
-    Scaletxtreader(temp10a, pathsum1, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        {
-        Message msg(log_slots, temp10a[i]);
-        BNsum1[i]=ecd.encode(msg, 4, 0);
-        }
-    }
 
-    temp10a.clear();
-    temp10a.shrink_to_fit();
+    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, 5, 2, 1, 32, 32, 3, ecd);
+
+    // vector<double> temp10;
+    // vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp10, pathmult1);
+    // kernel_ptxt(context, temp10, kernel1, 5, 2, 1, 32, 32, 3, ecd);
+    // temp10.clear();
+    // temp10.shrink_to_fit();
+
+
+    // vector<Plaintext> BNsum1(32, ptxt_init);
+    // vector<double> temp10a;
+    // Scaletxtreader(temp10a, pathsum1, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 32; ++i) {
+    //     {
+    //     Message msg(log_slots, temp10a[i]);
+    //     BNsum1[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
+
+    // temp10a.clear();
+    // temp10a.shrink_to_fit();
     
     timer.end();
-
 
     cout << "conv0 ..." << endl;
     timer.start(" conv0 ");
@@ -456,26 +487,32 @@ vector<vector<Ciphertext>>& input){
 
     cout << "uploading for conv1 ...\n";
     timer.start(" * ");
-    vector<double> temp11;
+
     vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp11, pathmult2);
-    kernel_ptxt(context, temp11, kernel2, 5, 2, 1, 32, 32, 3, ecd);
-    temp11.clear();
-    temp11.shrink_to_fit();
-
-
     vector<Plaintext> BNsum2(32, ptxt_init);
-    vector<double> temp11a;
-    Scaletxtreader(temp11a, pathsum2, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        {
-        Message msg(log_slots, temp11a[i]);
-        BNsum2[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp11a.clear();
-    temp11a.shrink_to_fit();
+
+    kernelEncode(context, pathmult2, pathsum2, 5, 2, 1, 32, 32, 3, ecd);
+
+    // vector<double> temp11;
+    // vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp11, pathmult2);
+    // kernel_ptxt(context, temp11, kernel2, 5, 2, 1, 32, 32, 3, ecd);
+    // temp11.clear();
+    // temp11.shrink_to_fit();
+
+
+    // vector<Plaintext> BNsum2(32, ptxt_init);
+    // vector<double> temp11a;
+    // Scaletxtreader(temp11a, pathsum2, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 32; ++i) {
+    //     {
+    //     Message msg(log_slots, temp11a[i]);
+    //     BNsum2[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
+    // temp11a.clear();
+    // temp11a.shrink_to_fit();
     
     timer.end();
 
@@ -562,7 +599,6 @@ vector<vector<Ciphertext>>& input){
 }    
 
 
-
 vector<vector<Ciphertext>> RB3(HEaaNTimer timer, Context context, KeyPack pack, HomEvaluator eval, EnDecoder ecd, 
 Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots, 
 string pathmult1, string pathsum1, string pathmult2, string pathsum2,
@@ -573,31 +609,37 @@ vector<vector<Ciphertext>>& input){
 
     cout << "uploading for conv0 ...\n";
     timer.start(" * ");
-    vector<double> temp17;
-    vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp17, pathmult1);
-    kernel_ptxt(context, temp17, kernel1, 5, 4, 1, 64, 64, 3, ecd);
-    temp17.clear();
-    temp17.shrink_to_fit();
-
-    vector<Plaintext> bias1(64, ptxt_init);
-    vector<double> temp17a;
-    Scaletxtreader(temp17a, pathsum1, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        Message msg(log_slots, temp17a[i]);
-        bias1[i]=ecd.encode(msg, 4, 0);
-    }
     
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        Message msg(log_slots, temp17a[i]);
-        bias1[i]=ecd.encode(msg, 4, 0);
-    }
+    vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    vector<Plaintext> bias1(64, ptxt_init);
+
+    kernelEncode(context, pathmult1, pathsum1, 5, 4, 1, 64, 64, 3, ecd);
+
+    // vector<double> temp17;
+    // vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp17, pathmult1);
+    // kernel_ptxt(context, temp17, kernel1, 5, 4, 1, 64, 64, 3, ecd);
+    // temp17.clear();
+    // temp17.shrink_to_fit();
+
+    // vector<Plaintext> bias1(64, ptxt_init);
+    // vector<double> temp17a;
+    // Scaletxtreader(temp17a, pathsum1, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 40; ++i) {
+    //     Message msg(log_slots, temp17a[i]);
+    //     bias1[i]=ecd.encode(msg, 4, 0);
+    // }
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 40; i < 64; ++i) {
+    //     Message msg(log_slots, temp17a[i]);
+    //     bias1[i]=ecd.encode(msg, 4, 0);
+    // }
 
 
-    temp17a.clear();
-    temp17a.shrink_to_fit();
+    // temp17a.clear();
+    // temp17a.shrink_to_fit();
     
     timer.end();
 
@@ -647,29 +689,35 @@ vector<vector<Ciphertext>>& input){
     
     cout << "uploading for conv1 ...\n";
     timer.start(" * ");
-    vector<double> temp18;
+
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp18, pathmult2);
-    kernel_ptxt(context, temp18, kernel2, 5, 4, 1, 64, 64, 3, ecd);
-    temp18.clear();
-    temp18.shrink_to_fit();
-
     vector<Plaintext> bias2(64, ptxt_init);
-    vector<double> temp18a;
-    Scaletxtreader(temp18a, pathsum2, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        Message msg(log_slots, temp18a[i]);
-        bias2[i]=ecd.encode(msg, 4, 0);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        Message msg(log_slots, temp18a[i]);
-        bias2[i]=ecd.encode(msg, 4, 0);
-    }
 
-    temp18a.clear();
-    temp18a.shrink_to_fit();
+    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, 5, 4, 1, 64, 64, 3, ecd);
+
+    // vector<double> temp18;
+    // vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp18, pathmult2);
+    // kernel_ptxt(context, temp18, kernel2, 5, 4, 1, 64, 64, 3, ecd);
+    // temp18.clear();
+    // temp18.shrink_to_fit();
+
+    // vector<Plaintext> bias2(64, ptxt_init);
+    // vector<double> temp18a;
+    // Scaletxtreader(temp18a, pathsum2, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 40; ++i) {
+    //     Message msg(log_slots, temp18a[i]);
+    //     bias2[i]=ecd.encode(msg, 4, 0);
+    // }
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 40; i < 64; ++i) {
+    //     Message msg(log_slots, temp18a[i]);
+    //     bias2[i]=ecd.encode(msg, 4, 0);
+    // }
+
+    // temp18a.clear();
+    // temp18a.shrink_to_fit();
     
     timer.end();
 
@@ -704,6 +752,8 @@ vector<vector<Ciphertext>>& input){
         }
     }
     cout << "DONE!" << "\n";
+
+
     input.clear();
     input.shrink_to_fit();
     ctxt_conv1_out.clear();
@@ -746,33 +796,40 @@ vector<vector<Ciphertext>>& input){
 
     cout << "uploading for conv0 ...\n";
     timer.start(" * ");
-    vector<double> temp17;
-    vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp17, pathmult1);
-    kernel_ptxt(context, temp17, kernel1, 5, 4, 1, 64, 64, 3, ecd);
-    temp17.clear();
-    temp17.shrink_to_fit();
-
-    vector<Plaintext> bias1(64, ptxt_init);
-    vector<double> temp17a;
-    Scaletxtreader(temp17a, pathsum1, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        Message msg(log_slots, temp17a[i]);
-        bias1[i]=ecd.encode(msg, 4, 0);
-    }
     
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        Message msg(log_slots, temp17a[i]);
-        bias1[i]=ecd.encode(msg, 4, 0);
-    }
+    vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    vector<Plaintext> bias1(64, ptxt_init);
+
+    kernelEncode(context, pathmult1, pathsum1, 5, 4, 1, 64, 64, 3, ecd);
+
+    // vector<double> temp17;
+    // vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp17, pathmult1);
+    // kernel_ptxt(context, temp17, kernel1, 5, 4, 1, 64, 64, 3, ecd);
+    // temp17.clear();
+    // temp17.shrink_to_fit();
+
+    // vector<Plaintext> bias1(64, ptxt_init);
+    // vector<double> temp17a;
+    // Scaletxtreader(temp17a, pathsum1, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 40; ++i) {
+    //     Message msg(log_slots, temp17a[i]);
+    //     bias1[i]=ecd.encode(msg, 4, 0);
+    // }
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 40; i < 64; ++i) {
+    //     Message msg(log_slots, temp17a[i]);
+    //     bias1[i]=ecd.encode(msg, 4, 0);
+    // }
 
 
-    temp17a.clear();
-    temp17a.shrink_to_fit();
+    // temp17a.clear();
+    // temp17a.shrink_to_fit();
     
     timer.end();
+
 
 
     cout << "conv0 ..." << endl;
@@ -820,29 +877,35 @@ vector<vector<Ciphertext>>& input){
     
     cout << "uploading for conv1 ...\n";
     timer.start(" * ");
-    vector<double> temp18;
+    
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp18, pathmult2);
-    kernel_ptxt(context, temp18, kernel2, 5, 4, 1, 64, 64, 3, ecd);
-    temp18.clear();
-    temp18.shrink_to_fit();
-
     vector<Plaintext> bias2(64, ptxt_init);
-    vector<double> temp18a;
-    Scaletxtreader(temp18a, pathsum2, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        Message msg(log_slots, temp18a[i]);
-        bias2[i]=ecd.encode(msg, 4, 0);
-    }
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        Message msg(log_slots, temp18a[i]);
-        bias2[i]=ecd.encode(msg, 4, 0);
-    }
 
-    temp18a.clear();
-    temp18a.shrink_to_fit();
+    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, 5, 4, 1, 64, 64, 3, ecd);
+
+    // vector<double> temp18;
+    // vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp18, pathmult2);
+    // kernel_ptxt(context, temp18, kernel2, 5, 4, 1, 64, 64, 3, ecd);
+    // temp18.clear();
+    // temp18.shrink_to_fit();
+
+    // vector<Plaintext> bias2(64, ptxt_init);
+    // vector<double> temp18a;
+    // Scaletxtreader(temp18a, pathsum2, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 40; ++i) {
+    //     Message msg(log_slots, temp18a[i]);
+    //     bias2[i]=ecd.encode(msg, 4, 0);
+    // }
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 40; i < 64; ++i) {
+    //     Message msg(log_slots, temp18a[i]);
+    //     bias2[i]=ecd.encode(msg, 4, 0);
+    // }
+
+    // temp18a.clear();
+    // temp18a.shrink_to_fit();
     
     timer.end();
 
@@ -917,28 +980,32 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     cout << "layer3 DSB start ... \n\n";
     cout << "upload conv_onebyone kernel ..." << endl;
     timer.start(" * ");
-    vector<double> temp7;
+    
     vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16_1_1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
-    txtreader(temp7, pathmult0);
-    {
-    kernel_ptxt(context, temp7, block4conv_onebyone_multiplicands32_16_1_1, 5, 1, 2, 32, 16, 1, ecd);
-    }
-    temp7.clear();
-    temp7.shrink_to_fit();
-
-
     vector<Plaintext> block4conv_onebyone_summands32(32, ptxt_init);
-    vector<double> temp7a;
-    Scaletxtreader(temp7a, pathsum0, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        {
-        Message msg(log_slots, temp7a[i]);
-        block4conv_onebyone_summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp7a.clear();
-    temp7a.shrink_to_fit();
+
+    kernelEncode(context, pathmult0, pathsum0, block4conv_onebyone_multiplicands32_16_1_1, block4conv_onebyone_summands32, 5, 1, 2, 32, 16, 1, ecd);
+
+    // vector<double> temp7;
+    // vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16__1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
+    // txtreader(temp7, pathmult0);
+
+    // kernel_ptxt(context, temp7, block4conv_onebyone_multiplicands32_16_1_1, 5, 1, 2, 32, 16, 1, ecd);
+
+    // temp7.clear();
+    // temp7.shrink_to_fit();
+
+
+    // vector<Plaintext> block4conv_onebyone_summands32(32, ptxt_init);
+    // vector<double> temp7a;
+    // Scaletxtreader(temp7a, pathsum0, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 32; ++i) {
+    //     Message msg(log_slots, temp7a[i]);
+    //     block4conv_onebyone_summands32[i]=ecd.encode(msg, 4, 0);
+    // }1
+    // temp7a.clear();
+    // temp7a.shrink_to_fit();
     
     timer.end();
 
@@ -949,7 +1016,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv_onebyone_multiplicands32_16_1_1);
+            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv_onebyone_multiplicands32_16_1_1);
         }
     }
 
@@ -1000,28 +1067,34 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
     cout << "uploading for block4conv0 ...\n\n";
     timer.start(" * ");
-    vector<double> temp8;
-    vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp8, pathmult1);
-    {
-    kernel_ptxt(context, temp8, block4conv0multiplicands32_16_3_3, 5, 1, 2, 32, 16, 3, ecd);
-    }
-    temp8.clear();
-    temp8.shrink_to_fit();
 
+    vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block4conv0summands32(32, ptxt_init);
-    vector<double> temp8a;
-    Scaletxtreader(temp8a, pathsum1, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        {
-        Message msg(log_slots, temp8a[i]);
-        block4conv0summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
+
+    kernelEncode(context, pathmult1, pathsum1, block4conv0multiplicands32_16_3_3, block4conv0summands32, 5, 1, 2, 32, 16, 3, ecd);
+
+    // vector<double> temp8;
+    // vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp8, pathmult1);
+    // {
+    // kernel_ptxt(context, temp8, block4conv0multiplicands32_16_3_3, 5, 1, 2, 32, 16, 3, ecd);
+    // }
+    // temp8.clear();
+    // temp8.shrink_to_fit();
+
+    // vector<Plaintext> block4conv0summands32(32, ptxt_init);
+    // vector<double> temp8a;
+    // Scaletxtreader(temp8a, pathsum1, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 32; ++i) {
+    //     {
+    //     Message msg(log_slots, temp8a[i]);
+    //     block4conv0summands32[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
     
-    temp8a.clear();
-    temp8a.shrink_to_fit();
+    // temp8a.clear();
+    // temp8a.shrink_to_fit();
     
     timer.end();
 
@@ -1033,12 +1106,12 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv0multiplicands32_16_3_3);
+            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv0multiplicands32_16_3_3);
         }
     }
 
-    input.clear();
-    input.shrink_to_fit();
+    ctxt_block3relu1_out.clear();
+    ctxt_block3relu1_out.shrink_to_fit();
 
     block4conv0multiplicands32_16_3_3.clear();
     block4conv0multiplicands32_16_3_3.shrink_to_fit();
@@ -1121,27 +1194,32 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
     cout << "upload conv1 kernel ... " <<endl;
     timer.start(" * ");
-    vector<double> temp9;
     vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp9, pathmult2);
-    {
-    kernel_ptxt(context, temp9, block4conv1multiplicands32_32_3_3, 5, 2, 1, 32, 32, 3, ecd);
-    }
-    temp9.clear();
-    temp9.shrink_to_fit();
-
     vector<Plaintext> block4conv1summands32(32, ptxt_init);
-    vector<double> temp9a;
-    Scaletxtreader(temp9a, pathsum2, cnst);
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 32; ++i) {
-        {
-        Message msg(log_slots, temp9a[i]);
-        block4conv1summands32[i]=ecd.encode(msg, 4, 0);
-        }
-    }
-    temp9a.clear();
-    temp9a.shrink_to_fit();
+
+    kernelEncode(context, pathmult2, pathsum2, block4conv1multiplicands32_32_3_3, block4conv1summands32, 5, 2, 1, 32, 32, 3, ecd);
+
+    // vector<double> temp9;
+    // vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp9, pathmult2);
+    // {
+    // kernel_ptxt(context, temp9, block4conv1multiplicands32_32_3_3, 5, 2, 1, 32, 32, 3, ecd);
+    // }
+    // temp9.clear();
+    // temp9.shrink_to_fit();
+
+    // vector<Plaintext> block4conv1summands32(32, ptxt_init);
+    // vector<double> temp9a;
+    // Scaletxtreader(temp9a, pathsum2, cnst);
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 32; ++i) {
+    //     {
+    //     Message msg(log_slots, temp9a[i]);
+    //     block4conv1summands32[i]=ecd.encode(msg, 4, 0);
+    //     }
+    // }
+    // temp9a.clear();
+    // temp9a.shrink_to_fit();
     
     timer.end();
 
@@ -1221,6 +1299,12 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4add_out.clear();
     ctxt_block4add_out.shrink_to_fit();
     
+    cout << "DONE!, decrypted message is ... " << "\n";
+
+    dec.decrypt(ctxt_block4relu1_out[0][0], sk, dmsg);
+    printMessage(dmsg);
+    cout << "layer3 Downsampling block DONE!" << "\n";
+    
     return ctxt_block4relu1_out;
     
 }
@@ -1236,33 +1320,38 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     timer.start(" * ");
     
     vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
-    
-    vector<double> temp14;
-    txtreader(temp14, pathmult0);
-    kernel_ptxt(context, temp14, block7conv_onebyone_multiplicands64_32_1_1, 5, 2, 2, 64, 32, 1, ecd);
-    
-    temp14.clear();
-    temp14.shrink_to_fit();
-
     vector<Plaintext> block7conv_onebyone_summands64(64, ptxt_init);
-    
-    vector<double> temp14a;
-    Scaletxtreader(temp14a, pathsum0, cnst);
 
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 40; ++i) {
-        Message msg(log_slots, temp14a[i]);
-        block7conv_onebyone_summands64[i]=ecd.encode(msg, 4, 0);
-    }
+    kernelEncode(context, pathmult0, pathsum0, block7conv_onebyone_multiplicands64_32_1_1, block7conv_onebyone_summands64)
     
-    #pragma omp parallel for num_threads(40)
-    for (int i = 40; i < 64; ++i) {
-        Message msg(log_slots, temp14a[i]);
-        block7conv_onebyone_summands64[i]=ecd.encode(msg, 4, 0);
-    }
+    vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     
-    temp14a.clear();
-    temp14a.shrink_to_fit();
+    // vector<double> temp14;
+    // txtreader(temp14, pathmult0);
+    // kernel_ptxt(context, temp14, block7conv_onebyone_multiplicands64_32_1_1, 5, 2, 2, 64, 32, 1, ecd);
+    
+    // temp14.clear();
+    // temp14.shrink_to_fit();
+
+    // vector<Plaintext> block7conv_onebyone_summands64(64, ptxt_init);
+    
+    // vector<double> temp14a;
+    // Scaletxtreader(temp14a, pathsum0, cnst);
+
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 40; ++i) {
+    //     Message msg(log_slots, temp14a[i]);
+    //     block7conv_onebyone_summands64[i]=ecd.encode(msg, 4, 0);
+    // }
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 40; i < 64; ++i) {
+    //     Message msg(log_slots, temp14a[i]);
+    //     block7conv_onebyone_summands64[i]=ecd.encode(msg, 4, 0);
+    // }
+    
+    // temp14a.clear();
+    // temp14a.shrink_to_fit();
     
     timer.end();
 
@@ -1275,7 +1364,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     for (int i = 0; i < 4; ++i) {
         #pragma omp parallel num_threads(10)
         {
-            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, input[i], block7conv_onebyone_multiplicands64_32_1_1);
+            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv_onebyone_multiplicands64_32_1_1);
         }
     }
 
@@ -1323,26 +1412,32 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     
     cout << "upload conv0 kernel ..." << endl;
     timer.start(" * ");
-    vector<double> temp15;
+
     vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
-
-    txtreader(temp15, pathmult1);
-    kernel_ptxt(context, temp15, block7conv0multiplicands64_32_3_3, 5, 2, 2, 64, 32, 3, ecd);
-    
-    temp15.clear();
-    temp15.shrink_to_fit();
-
     vector<Plaintext> block7conv0summands64(64, ptxt_init);
-    vector<double> temp15a;
-    Scaletxtreader(temp15a, pathsum1, cnst);
+
+    kernelEncode(context, pathmult1, pathsum1, block7conv0multiplicands64_32_3_3, block7conv0summands64, 5, 2, 2, 64, 32, 3, ecd);
+
+    // vector<double> temp15;
+    // vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
+
+    // txtreader(temp15, pathmult1);
+    // kernel_ptxt(context, temp15, block7conv0multiplicands64_32_3_3, 5, 2, 2, 64, 32, 3, ecd);
     
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 64; ++i) {
-        Message msg(log_slots, temp15a[i]);
-        block7conv0summands64[i]=ecd.encode(msg, 4, 0);
-    }
-    temp15a.clear();
-    temp15a.shrink_to_fit();
+    // temp15.clear();
+    // temp15.shrink_to_fit();
+
+    // vector<Plaintext> block7conv0summands64(64, ptxt_init);
+    // vector<double> temp15a;
+    // Scaletxtreader(temp15a, pathsum1, cnst);
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 64; ++i) {
+    //     Message msg(log_slots, temp15a[i]);
+    //     block7conv0summands64[i]=ecd.encode(msg, 4, 0);
+    // }
+    // temp15a.clear();
+    // temp15a.shrink_to_fit();
     
     timer.end();
 
@@ -1355,8 +1450,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
         ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv0multiplicands64_32_3_3);
     }
 
-    input.clear();
-    input.shrink_to_fit();
+    ctxt_block6relu1_out.clear();
+    ctxt_block6relu1_out.shrink_to_fit();
 
     block7conv0multiplicands64_32_3_3.clear();
     block7conv0multiplicands64_32_3_3.shrink_to_fit();
@@ -1372,6 +1467,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
             }
         }
     }
+    
 
     ctxt_block7conv0_out.clear();
     ctxt_block7conv0_out.shrink_to_fit();
@@ -1423,28 +1519,34 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     cout << "upload conv1 kernel ..." << endl;
     timer.start(" * ");
 
-    vector<double> temp16;
     vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
-    txtreader(temp16, pathmult2);
-    {
-        kernel_ptxt(context, temp16, block7conv1multiplicands64_64_3_3, 5, 4, 1, 64, 64, 3, ecd);
-    }
-    
-    temp16.clear();
-    temp16.shrink_to_fit();
-
     vector<Plaintext> block7conv1summands64(64, ptxt_init);
-    vector<double> temp16a;
-    Scaletxtreader(temp16a, pathsum2, cnst);
-    
-    #pragma omp parallel for num_threads(40)
-    for (int i = 0; i < 64; ++i) {
-        Message msg(log_slots, temp16a[i]);
-        block7conv1summands64[i]=ecd.encode(msg, 4, 0);
-    }
 
-    temp16a.clear();
-    temp16a.shrink_to_fit();
+    kernelEncode(context, pathmult2, pathsum2, block7conv1multiplicands64_64_3_3, block7conv1summands64, 5, 4, 1, 64, 64, 3, ecd);
+
+    // vector<double> temp16;
+    // vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
+    // txtreader(temp16, pathmult2);
+    
+    // {
+    //     kernel_ptxt(context, temp16, block7conv1multiplicands64_64_3_3, 5, 4, 1, 64, 64, 3, ecd);
+    // }
+    
+    // temp16.clear();
+    // temp16.shrink_to_fit();
+
+    // vector<Plaintext> block7conv1summands64(64, ptxt_init);
+    // vector<double> temp16a;
+    // Scaletxtreader(temp16a, pathsum2, cnst);
+    
+    // #pragma omp parallel for num_threads(40)
+    // for (int i = 0; i < 64; ++i) {
+    //     Message msg(log_slots, temp16a[i]);
+    //     block7conv1summands64[i]=ecd.encode(msg, 4, 0);
+    // }
+
+    // temp16a.clear();
+    // temp16a.shrink_to_fit();
     
     timer.end();
     
