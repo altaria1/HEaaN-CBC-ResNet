@@ -336,21 +336,24 @@ int main() {
     /////////////////////////
     /////// Avg Pool ////////
     /////////////////////////
-    cout << "evaluating Avgpool" << "\n";
+    
+    cout << "Average pooling start! ... ";
+    timer.start("");
     vector<Ciphertext> ctxt_avgp_out;
-    timer.start(" avgpool * ");
     ctxt_avgp_out = Avgpool(context, pack, eval, layer4_block2_out[0]);
     timer.end();
     
-    // std::cout << "AvgPool result" << std::endl;
-    // dec.decrypt(ctxt_avgp_out[0], sk, dmsg);
-    // printMessage(dmsg);
-
     layer4_block2_out.clear();
     layer4_block2_out.shrink_to_fit();
     
-    //FC64 setup...
-
+    
+    ///////////////////////////////////////
+    ///////// FC64 setup... //////////////
+    /////////////////////////////////////
+    
+    
+    cout << "Fully Connected layer start! ... ";
+    
     cout << "uploading for FC64 layer ...";
     timer.start(" * ");
     vector<double> temp21;
