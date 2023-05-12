@@ -76,8 +76,6 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     input.clear();
     input.shrink_to_fit();
 
-    cout <<"\n";
-
     block0conv0multiplicands16_3_3_3.clear();
     block0conv0multiplicands16_3_3_3.shrink_to_fit();
     block0conv0summands16.clear();
