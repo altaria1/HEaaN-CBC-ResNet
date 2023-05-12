@@ -25,7 +25,7 @@ vector<vector<Ciphertext>> Conv_first(HEaaNTimer timer, Context context, KeyPack
 Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots, 
 string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     
-    cout << "parameter encoding ... " << endl;
+    cout << "parameter encoding ...";
     timer.start(" * ");
 
     vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
@@ -59,7 +59,7 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     timer.end();
     
     // Convolution 0
-    cout << "convolution ... " << endl;
+    cout << "convolution ...";
     timer.start(" * ");
     vector<vector<Ciphertext>> ctxt_block0conv0_out(16, vector<Ciphertext>(16, ctxt_init));
     
@@ -143,7 +143,7 @@ string pathmult1, string pathsum1, string pathmult2, string pathsum2,
 vector<vector<Ciphertext>>& input){
 
    // 1st conv
-    cout<< "conv0 start!\n parameter encoding ..." << endl;
+    cout<< "conv0 start!\n parameter encoding ...";
     timer.start(" * ");
 
     vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -175,7 +175,7 @@ vector<vector<Ciphertext>>& input){
     timer.end();
 
     ///////////////////////// Main flow /////////////////////////////////////////
-    cout << "convolution ..." << endl;
+    cout << "convolution ...";
     timer.start(" * ");
 
     vector<vector<Ciphertext>> ctxt_conv0_out(16, vector<Ciphertext>(16, ctxt_init));
@@ -201,7 +201,7 @@ vector<vector<Ciphertext>>& input){
 
 
     // AppReLU
-    cout << "AppReLU ..." << endl;
+    cout << "AppReLU ...";
     timer.start(" * ");
     
     vector<vector<Ciphertext>> ctxt_relu0_out(16, vector<Ciphertext>(16, ctxt_init));
