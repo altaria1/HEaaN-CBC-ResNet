@@ -125,7 +125,7 @@ int main() {
     ////////////////////////////////////////////////////////////
     
     //// 0st conv ///
-    std::cout << "layer1 Convolution .. " << std::endl;
+    std::cout << "layer1 Convolution ... " << std::endl;
     vector<vector<Ciphertext>> ctxt_block0relu0_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
@@ -209,7 +209,7 @@ int main() {
     /////// DSB1 ///////
     ////////////////////
     
-    std::cout << "layer3 Downsampling Residual Block1 .. " << std::endl;
+    std::cout << "layer3 Downsampling Residual Block 1 ... " << std::endl;
     vector<vector<Ciphertext>> ctxt_block4relu1_out;
     
     string path4 = common_path_mult + string("layer3_0_downsample_weight_32_16_1_1.txt");
@@ -232,7 +232,7 @@ int main() {
     /////// RB4 ////////
     ////////////////////
     
-    std::cout << "layer3_RB1 .. " << std::endl;
+    std::cout << "layer3 Residual Block 2 ... " << std::endl;
     vector<vector<Ciphertext>> layer3_block1_out;
     string path20 = common_path_mult + string("layer3_1_conv1_weight_32_32_3_3.txt");
     string path20a = common_path_sum + string("layer3_1_conv1_bias_32.txt");
@@ -252,7 +252,7 @@ int main() {
     ////////////////////
     /////// RB5 ////////
     ////////////////////
-    std::cout << "layer3_RB2 .. " << std::endl;
+    std::cout << "layer3 Residual Block 3 .. " << std::endl;
     vector<vector<Ciphertext>> layer3_block2_out;
     string path21 = common_path_mult + string("layer3_2_conv1_weight_32_32_3_3.txt");
     string path21a = common_path_sum + string("layer3_2_conv1_bias_32.txt");
@@ -273,7 +273,7 @@ int main() {
     /////// DSB2 ///////
     ////////////////////
     
-    std::cout << "layer4_DSB2 .. " << std::endl;
+    std::cout << "layer4 Downsampling Residual Block 1 ... " << std::endl;
     vector<vector<Ciphertext>> ctxt_block7relu1_out;
     
     string path37 = common_path_mult + string("layer4_0_downsample_weight_64_32_1_1.txt");
@@ -295,7 +295,7 @@ int main() {
     ////////////////////
     /////// RB6 ////////
     ////////////////////
-    std::cout << "layer4_RB1 .. " << std::endl;
+    std::cout << "layer4 Residual Block 2 ... " << std::endl;
     vector<vector<Ciphertext>> layer4_block1_out;
     string path38 = common_path_mult + string("layer4_1_conv1_weight_64_64_3_3.txt");
     string path38a = common_path_sum + string("layer4_1_conv1_bias_64.txt");
@@ -316,7 +316,7 @@ int main() {
     ////////////////////
     /////// RB7 ////////
     ////////////////////
-    std::cout << "layer4_RB2 .. " << std::endl;
+    std::cout << "layer4 Residual Block 3 ... " << std::endl;
     vector<vector<Ciphertext>> layer4_block2_out;
     string path39 = common_path_mult + string("layer4_2_conv1_weight_64_64_3_3.txt");
     string path39a = common_path_sum + string("layer4_2_conv1_bias_64.txt");
