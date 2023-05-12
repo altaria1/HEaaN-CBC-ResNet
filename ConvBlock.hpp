@@ -129,7 +129,7 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     ctxt_block0conv0_out.clear();
     ctxt_block0conv0_out.shrink_to_fit();
 
-    cout << "DONE!\n";
+    cout << "DONE!\n\n";
     
     return ctxt_block0relu0_out;
 }
@@ -143,7 +143,7 @@ string pathmult1, string pathsum1, string pathmult2, string pathsum2,
 vector<vector<Ciphertext>>& input){
 
    // 1st conv
-    cout<< "conv0 start!\n parameter encoding ...";
+    cout<< "conv0 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -246,10 +246,10 @@ vector<vector<Ciphertext>>& input){
     
     ctxt_conv0_out.clear();
     ctxt_conv0_out.shrink_to_fit();
-    cout << "DONE!\n";
+    cout << "DONE!\n\n";
     
 
-    cout<< "conv1 start!\n parameter encoding ... ";
+    cout<< "conv1 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -368,7 +368,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
     
-    cout << " DONE!\n";
+    cout << " DONE!\n\n";
 
     return output;
 
@@ -382,7 +382,7 @@ vector<vector<Ciphertext>>& input){
 
     /// 1st conv...
 
-    cout << "conv0 start!\n parameter encoding ...";
+    cout << "conv0 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -464,7 +464,7 @@ vector<vector<Ciphertext>>& input){
     // }
 
     timer.end();
-    cout << "DONE!\n";
+    cout << "DONE!\n\n";
 
     ctxt_conv0_out.clear();
     ctxt_conv0_out.shrink_to_fit();
@@ -472,7 +472,7 @@ vector<vector<Ciphertext>>& input){
     
     // Second convolution
 
-    cout << "conv1 start!\n parameter encoding ... ";
+    cout << "conv1 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -578,7 +578,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
     
-    cout << "DONE!\n";
+    cout << "DONE!\n\n";
 
     return output;
     
@@ -593,7 +593,7 @@ vector<vector<Ciphertext>>& input){
 
     ///////////////////////// Main flow /////////////////////////////////////////
 
-    cout << "conv0 start!\n parameter encoding ";
+    cout << "conv0 start!\nparameter encoding ... ";
     timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -662,7 +662,7 @@ vector<vector<Ciphertext>>& input){
     // }
 
     timer.end();
-    cout << "DONE!" << "\n";
+    cout << "DONE!\n\n";
 
     ctxt_conv0_out.clear();
     ctxt_conv0_out.shrink_to_fit();
@@ -671,7 +671,7 @@ vector<vector<Ciphertext>>& input){
     // Second convolution
 
     
-    cout << "conv1 start!\n parameter encoding ... ";
+    cout << "conv1 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -760,7 +760,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
 
-    cout << " DONE!\n";
+    cout << "DONE!\n\n";
     
     return output;
 
@@ -775,7 +775,7 @@ vector<vector<Ciphertext>>& input){
 
     ///////////////////////// Main flow /////////////////////////////////////////
 
-    cout << "conv0 start!\n parameter encoding ... ";
+    cout << "conv0 start!\nparameter encoding ... ";
     timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -843,7 +843,7 @@ vector<vector<Ciphertext>>& input){
     // }
 
     timer.end();
-    cout << "DONE!" << "\n";
+    cout << "DONE!\n\n";
 
     ctxt_conv0_out.clear();
     ctxt_conv0_out.shrink_to_fit();
@@ -852,7 +852,7 @@ vector<vector<Ciphertext>>& input){
 
     // Second convolution
     
-    cout << "conv1 start!\n parameter encoding ... ";
+    cout << "conv1 start!\nparameter encoding ... ";
     timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -941,7 +941,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
 
-    cout << " DONE! " << "\n";
+    cout << "DONE!\n\n";
     
     return output;
 
@@ -953,7 +953,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     string pathmult0, string pathsum0, string pathmult1, string pathsum1, string pathmult2, string pathsum2,
     vector<vector<Ciphertext>>& input){
     
-    cout << "conv_downsample start!\n parameter encoding ... ";
+    cout << "conv_downsample start!\nparameter encoding ... ";
     timer.start("");
     
     vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16_1_1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
@@ -1029,6 +1029,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
 
     addBNsummands(context, eval, ctxt_block4MPP1_out, block4conv_onebyone_summands32, 4, 32);
     timer.end();
+    cout << "DONE!\n\n";
 
 
     block4conv_onebyone_summands32.clear();
@@ -1038,7 +1039,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ///////////////////////// Main flow /////////////////////////////////////////
 
     
-    cout << "conv0 start!\n parameter encoding ... ";
+    cout << "conv0 start!\nparameter encoding ... ";
     timer.start("");
 
     vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -1156,7 +1157,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4MPP0_out.clear();
     ctxt_block4MPP0_out.shrink_to_fit();
 
-    cout << "DONE!\n";
+    cout << "DONE!\n\n";
     
     
     // Second convolution
@@ -1365,12 +1366,11 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     
     addBNsummands(context, eval, ctxt_block7MPP1_out, block7conv_onebyone_summands64, 1, 64);
     timer.end();
+    cout << "DONE!\n\n";
 
     block7conv_onebyone_summands64.clear();
     block7conv_onebyone_summands64.shrink_to_fit();
 
-    cout << "DONE!\n\n";
-    
     cout << "conv0 start!\nparameter encoding ... ";
     timer.start("");
 
