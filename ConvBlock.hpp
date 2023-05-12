@@ -30,7 +30,7 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block0conv0summands16(16, ptxt_init);
 
-    kernelEncode(context, pathmult, pathsum, block0conv0multiplicands16_3_3_3, block0conv0summands16, cnst, 5, 1, 1, 16, 3, 3, ecd);
+    kernelEncode_first(context, pathmult, pathsum, block0conv0multiplicands16_3_3_3, block0conv0summands16, cnst, 5, 1, 1, 16, 3, 3, ecd);
 
     // vector<double> temp0;
     // vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
@@ -1439,7 +1439,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     cout << "convolution ..." <<endl;
     vector<vector<Ciphertext>> ctxt_block7conv0_out(4, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 4; ++i) { // 서로 다른 img
-        ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv0multiplicands64_32_3_3);
+        ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, input[i], block7conv0multiplicands64_32_3_3);
     }
 
     input.clear();
