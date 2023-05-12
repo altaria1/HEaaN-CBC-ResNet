@@ -25,8 +25,8 @@ vector<vector<Ciphertext>> Conv_first(HEaaNTimer timer, Context context, KeyPack
 Ciphertext& ctxt_init, Plaintext& ptxt_init, double cnst, auto log_slots, 
 string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     
-    cout << "parameter encoding ...";
-    timer.start(" * ");
+    cout << "parameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block0conv0summands16(16, ptxt_init);
@@ -59,8 +59,8 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     timer.end();
     
     // Convolution 0
-    cout << "convolution ...";
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block0conv0_out(16, vector<Ciphertext>(16, ctxt_init));
     
     #pragma omp parallel for num_threads(40)
@@ -83,8 +83,8 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     block0conv0summands16.clear();
     block0conv0summands16.shrink_to_fit();
     
-    cout << "AppReLU ... " << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block0relu0_out(16, vector<Ciphertext>(16, ctxt_init)); 
     ApproxReLU_bundle(context, eval, ctxt_block0relu0_out, ctxt_block0relu0_out);
     
@@ -129,7 +129,7 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     ctxt_block0conv0_out.clear();
     ctxt_block0conv0_out.shrink_to_fit();
 
-    cout << "DONE!\n\n";
+    cout << "DONE!\n";
     
     return ctxt_block0relu0_out;
 }
@@ -144,7 +144,7 @@ vector<vector<Ciphertext>>& input){
 
    // 1st conv
     cout<< "conv0 start!\n parameter encoding ...";
-    timer.start(" * ");
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum1(16, ptxt_init);
@@ -176,7 +176,7 @@ vector<vector<Ciphertext>>& input){
 
     ///////////////////////// Main flow /////////////////////////////////////////
     cout << "convolution ...";
-    timer.start(" * ");
+    timer.start("");
 
     vector<vector<Ciphertext>> ctxt_conv0_out(16, vector<Ciphertext>(16, ctxt_init));
     
@@ -202,7 +202,7 @@ vector<vector<Ciphertext>>& input){
 
     // AppReLU
     cout << "AppReLU ...";
-    timer.start(" * ");
+    timer.start("");
     
     vector<vector<Ciphertext>> ctxt_relu0_out(16, vector<Ciphertext>(16, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_conv0_out, ctxt_relu0_out);
@@ -250,7 +250,7 @@ vector<vector<Ciphertext>>& input){
     
 
     cout<< "conv1 start!\n parameter encoding ... ";
-    timer.start(" * ");
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum2(16, ptxt_init);
@@ -281,8 +281,8 @@ vector<vector<Ciphertext>>& input){
     timer.end();
     
     // Second convolution
-    cout << "convolution ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv1_out(16, vector<Ciphertext>(16, ctxt_init));
     
     #pragma omp parallel for num_threads(40)
@@ -321,8 +321,8 @@ vector<vector<Ciphertext>>& input){
 
 
     // Last AppReLU
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> output(16, vector<Ciphertext>(16, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_add_out, output);
 
@@ -382,8 +382,8 @@ vector<vector<Ciphertext>>& input){
 
     /// 1st conv...
 
-    cout << "conv0 start!\n parameter encoding ..." << endl;
-    timer.start(" * ");
+    cout << "conv0 start!\n parameter encoding ...";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum1(32, ptxt_init);
@@ -414,8 +414,8 @@ vector<vector<Ciphertext>>& input){
     
     timer.end();
 
-    cout << "convolution ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv0_out(4, vector<Ciphertext>(32, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 4; ++i) {
@@ -435,8 +435,8 @@ vector<vector<Ciphertext>>& input){
 
 
     // AppReLU
-    cout << "AppReLU ... " << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_relu0_out(4, vector<Ciphertext>(32, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_conv0_out, ctxt_relu0_out);
 
@@ -464,7 +464,7 @@ vector<vector<Ciphertext>>& input){
     // }
 
     timer.end();
-    cout << "DONE!" << "\n";
+    cout << "DONE!\n";
 
     ctxt_conv0_out.clear();
     ctxt_conv0_out.shrink_to_fit();
@@ -472,8 +472,8 @@ vector<vector<Ciphertext>>& input){
     
     // Second convolution
 
-    cout << "conv1 start!\n parameter encoding ...\n";
-    timer.start(" * ");
+    cout << "conv1 start!\n parameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum2(32, ptxt_init);
@@ -504,8 +504,8 @@ vector<vector<Ciphertext>>& input){
     timer.end();
 
 
-    cout << "convolution ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv1_out(4, vector<Ciphertext>(32, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 4; ++i) {
@@ -544,8 +544,8 @@ vector<vector<Ciphertext>>& input){
 
 
     // Last AppReLU
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
 
     vector<vector<Ciphertext>> output(4, vector<Ciphertext>(32, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_add_out, output);
@@ -578,7 +578,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
     
-    cout << " DONE!\n ";
+    cout << "DONE!\n";
 
     return output;
     
@@ -593,8 +593,8 @@ vector<vector<Ciphertext>>& input){
 
     ///////////////////////// Main flow /////////////////////////////////////////
 
-    cout << "conv0 start!\n parameter encoding";
-    timer.start(" * ");
+    cout << "conv0 start!\n parameter encoding ";
+    timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias1(64, ptxt_init);
@@ -630,8 +630,8 @@ vector<vector<Ciphertext>>& input){
     timer.end();
 
 
-    cout << "convolution ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv0_out(1, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 1; ++i) { 
         ctxt_conv0_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, input[i], kernel1);
@@ -647,8 +647,8 @@ vector<vector<Ciphertext>>& input){
     bias1.shrink_to_fit();
 
     // AppReLU
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_relu0_out(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_conv0_out, ctxt_relu0_out);
 
@@ -671,8 +671,8 @@ vector<vector<Ciphertext>>& input){
     // Second convolution
 
     
-    cout << "conv1 start!\n parameter encoding ..." << endl;
-    timer.start(" * ");
+    cout << "conv1 start!\n parameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias2(64, ptxt_init);
@@ -706,8 +706,8 @@ vector<vector<Ciphertext>>& input){
     timer.end();
 
 
-    cout << "convolution ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv1_out(1, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 1; ++i) {
         ctxt_conv1_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, ctxt_relu0_out[i], kernel2);
@@ -741,8 +741,8 @@ vector<vector<Ciphertext>>& input){
     ctxt_conv1_out.shrink_to_fit();
 
 
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> output(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_add_out, output);
 
@@ -760,7 +760,7 @@ vector<vector<Ciphertext>>& input){
     ctxt_add_out.clear();
     ctxt_add_out.shrink_to_fit();
 
-    cout << " DONE! " << "\n";
+    cout << " DONE!\n";
     
     return output;
 
@@ -775,8 +775,8 @@ vector<vector<Ciphertext>>& input){
 
     ///////////////////////// Main flow /////////////////////////////////////////
 
-    cout << "conv0 start! ...\n";
-    timer.start(" * ");
+    cout << "conv0 start!\n parameter encoding ... ";
+    timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias1(64, ptxt_init);
@@ -811,10 +811,8 @@ vector<vector<Ciphertext>>& input){
     
     timer.end();
 
-
-
-    cout << "conv0 ..." << endl;
-    timer.start(" conv0 ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv0_out(1, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 1; ++i) { 
         ctxt_conv0_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, input[i], kernel1);
@@ -822,7 +820,6 @@ vector<vector<Ciphertext>>& input){
 
     addBNsummands(context, eval, ctxt_conv0_out, bias1, 1, 64);
     timer.end();
-    cout << "DONE!\n";
 
 
     kernel1.clear();
@@ -831,8 +828,8 @@ vector<vector<Ciphertext>>& input){
     bias1.shrink_to_fit();
 
     // AppReLU
-    cout << "relu0 ..." << endl;
-    timer.start(" relu0 ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_relu0_out(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_conv0_out, ctxt_relu0_out);
 
@@ -854,10 +851,9 @@ vector<vector<Ciphertext>>& input){
 
 
     // Second convolution
-
     
-    cout << "uploading for conv1 ...\n";
-    timer.start(" * ");
+    cout << "conv1 start!\n parameter encoding ... ";
+    timer.start("");
     
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias2(64, ptxt_init);
@@ -891,8 +887,8 @@ vector<vector<Ciphertext>>& input){
     timer.end();
 
 
-    cout << "conv1 ..." << endl;
-    timer.start(" conv1 ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_conv1_out(1, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 1; ++i) {
         ctxt_conv1_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, ctxt_relu0_out[i], kernel2);
@@ -900,7 +896,6 @@ vector<vector<Ciphertext>>& input){
 
     addBNsummands(context, eval, ctxt_conv1_out, bias2, 1, 64);
     timer.end();
-    cout << "DONE!\n";
 
 
     ctxt_relu0_out.clear();
@@ -912,7 +907,7 @@ vector<vector<Ciphertext>>& input){
     
 
     //////////////////////////// Main flow + Residual flow //////////////////////////////////
-    cout << "add ..." << endl;
+    cout << "Add two flows ... " << endl;
     vector<vector<Ciphertext>> ctxt_add_out(1, vector<Ciphertext>(64, ctxt_init));
     #pragma omp parallel for collapse(2) num_threads(40)
     for (int i = 0; i < 1; ++i) {
@@ -920,15 +915,15 @@ vector<vector<Ciphertext>>& input){
             eval.add(ctxt_conv1_out[i][ch], input[i][ch], ctxt_add_out[i][ch]);
         }
     }
-    cout << "DONE!" << "\n";
+    
     input.clear();
     input.shrink_to_fit();
     ctxt_conv1_out.clear();
     ctxt_conv1_out.shrink_to_fit();
 
 
-    cout << "relu1 ..." << endl;
-    timer.start(" relu1 ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> output(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_add_out, output);
 
@@ -958,9 +953,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     string pathmult0, string pathsum0, string pathmult1, string pathsum1, string pathmult2, string pathsum2,
     vector<vector<Ciphertext>>& input){
     
-    cout << "layer3 DSB start ... \n\n";
-    cout << "upload conv_onebyone kernel ..." << endl;
-    timer.start(" * ");
+    cout << "conv_downsample start!\n parameter encoding ... ";
+    timer.start("");
     
     vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16_1_1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
     vector<Plaintext> block4conv_onebyone_summands32(32, ptxt_init);
@@ -990,9 +984,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
 
-    cout << "layer3 DSB conv_onebyone ..." << endl;
-    timer.start(" * ");
-    cout << "convolution ...\n\n";
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block4conv_onebyone_out(16, vector<Ciphertext>(32, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
@@ -1005,7 +998,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     block4conv_onebyone_multiplicands32_16_1_1.shrink_to_fit();
 
     // MPP input bundle making
-    cout << "MPpacking ... \n\n";
+    cout << "Multiplex Parallel packing ... ";
     vector<vector<vector<Ciphertext>>> ctxt_block4MPP1_in(4, vector<vector<Ciphertext>>(32, vector<Ciphertext>(4, ctxt_init)));
 
     #pragma omp parallel for collapse(3) num_threads(40)
@@ -1037,7 +1030,6 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     addBNsummands(context, eval, ctxt_block4MPP1_out, block4conv_onebyone_summands32, 4, 32);
     timer.end();
 
-    cout << "DONE!\n\n";
 
     block4conv_onebyone_summands32.clear();
     block4conv_onebyone_summands32.shrink_to_fit();
@@ -1046,8 +1038,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ///////////////////////// Main flow /////////////////////////////////////////
 
     
-    cout << "uploading for block4conv0 ...\n\n";
-    timer.start(" * ");
+    cout << "conv0 start!\n parameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block4conv0summands32(32, ptxt_init);
@@ -1079,10 +1071,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
 
-    cout << "layer3 DSB ..." << endl;
-    timer.start(" * ");
-    
-    cout <<"convolution ...\n\n";
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block4conv0_out(16, vector<Ciphertext>(32, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
@@ -1099,7 +1089,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
 
     
     // MPP input bundle making
-    cout << "MPpacking ...\n" << endl;
+    cout << "Multiplexed Parallel Packing ... ";
     vector<vector<vector<Ciphertext>>> ctxt_block4MPP0_in(4, vector<vector<Ciphertext>>(32, vector<Ciphertext>(4, ctxt_init)));
     #pragma omp parallel for collapse(3) num_threads(40)
     for (int i = 0; i < 4; ++i) {
@@ -1132,11 +1122,9 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     block4conv0summands32.clear();
     block4conv0summands32.shrink_to_fit();
 
-    cout << "Done!! \n\n" ;
-
     // AppReLU
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block4relu0_out(4, vector<Ciphertext>(32, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_block4MPP0_out, ctxt_block4relu0_out);
 
@@ -1168,13 +1156,13 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4MPP0_out.clear();
     ctxt_block4MPP0_out.shrink_to_fit();
 
-    cout << "DONE!\n" << "\n";
+    cout << "DONE!\n";
     
     
     // Second convolution
     
-    cout << "upload conv1 kernel ... " <<endl;
-    timer.start(" * ");
+    cout << "conv1 start!\nparameter encoding ... ";
+    timer.start("");
     vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block4conv1summands32(32, ptxt_init);
 
@@ -1204,8 +1192,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
 
-    cout << "layer4 DSB conv1 ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block4conv1_out(4, vector<Ciphertext>(32, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 4; ++i) {
@@ -1226,10 +1214,9 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     block4conv1summands32.clear();
     block4conv1summands32.shrink_to_fit();
 
-    cout << "Done!!\n" << "\n";
 
     //////////////////////////// Main flow + Residual flow //////////////////////////////////
-    cout << "block4add..." << endl;
+    cout << "Add two flows ... " << endl;
     vector<vector<Ciphertext>> ctxt_block4add_out(4, vector<Ciphertext>(32, ctxt_init));
 
     #pragma omp parallel for collapse(2) num_threads(40)
@@ -1246,8 +1233,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     
 
     // Last AppReLU
-    cout << "block4relu1 ..." << endl;
-    timer.start(" block4relu1 ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block4relu1_out(4, vector<Ciphertext>(32, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_block4add_out, ctxt_block4relu1_out);
 
@@ -1280,7 +1267,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4add_out.clear();
     ctxt_block4add_out.shrink_to_fit();
     
-    cout << "layer3 Downsampling block DONE!" << "\n";
+    cout << "DONE!\n\n";
     
     return ctxt_block4relu1_out;
     
@@ -1292,9 +1279,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     string pathmult0, string pathsum0, string pathmult1, string pathsum1, string pathmult2, string pathsum2,
     vector<vector<Ciphertext>>& input){
     
-    cout << "layer4 DSB start ...\n";
-    cout << "upload conv_onebyone kernel ..." << endl;
-    timer.start(" * ");
+    cout << "conv_downsample start!\nparameter encoding ... ";
+    timer.start("");
     
     vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     vector<Plaintext> block7conv_onebyone_summands64(64, ptxt_init);
@@ -1332,10 +1318,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
 
-    cout << "layer4 DSB conv_onebyone ..." << endl;
-    timer.start(" * ");
-    
-    cout << "convolution ..." <<endl;
+    cout << "convolution ..." << endl;
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block7conv_onebyone_out(4, vector<Ciphertext>(64, ctxt_init));
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 4; ++i) {
@@ -1351,7 +1335,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     cout << "Done!! \n" << "\n";
 
     // MPP input bundle making
-    cout << "MPpacking ..." << endl;
+    cout << "Multiplexed Parallel Packing ... ";
     vector<vector<vector<Ciphertext>>> ctxt_block7MPP1_in(1, vector<vector<Ciphertext>>(64, vector<Ciphertext>(4, ctxt_init)));
 
     #pragma omp parallel for collapse(3) num_threads(40)
@@ -1385,10 +1369,10 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     block7conv_onebyone_summands64.clear();
     block7conv_onebyone_summands64.shrink_to_fit();
 
-    cout << "Done!! \n" << "\n";
+    cout << "DONE!\n\n";
     
-    cout << "upload conv0 kernel ..." << endl;
-    timer.start(" * ");
+    cout << "conv0 start!\nparameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block7conv0summands64(64, ptxt_init);
@@ -1418,10 +1402,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
 
-    cout << "layer4 DSB conv0 ..." << endl;
-    timer.start(" * ");
-    
-    cout << "convolution ..." <<endl;
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block7conv0_out(4, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 4; ++i) { // 서로 다른 img
         ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, input[i], block7conv0multiplicands64_32_3_3);
@@ -1434,7 +1416,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     block7conv0multiplicands64_32_3_3.shrink_to_fit();
 
     // MPP input bundle making
-    cout << "MPpacking ..." << endl;
+    cout << "Multiplexed Parallel Packing ... ";
     vector<vector<vector<Ciphertext>>> ctxt_block7MPP0_in(1, vector<vector<Ciphertext>>(64, vector<Ciphertext>(4, ctxt_init)));
     #pragma omp parallel for collapse(3) num_threads(40)
     for (int i = 0; i < 1; ++i) {
@@ -1444,7 +1426,6 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
             }
         }
     }
-    
 
     ctxt_block7conv0_out.clear();
     ctxt_block7conv0_out.shrink_to_fit();
@@ -1468,11 +1449,9 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     block7conv0summands64.clear();
     block7conv0summands64.shrink_to_fit();
     
-    cout << "Done!! \n\n";
-
     // AppReLU
-    cout << "AppReLU ..." << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block7relu0_out(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_block7MPP0_out, ctxt_block7relu0_out);
 
@@ -1491,10 +1470,10 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block7MPP0_out.clear();
     ctxt_block7MPP0_out.shrink_to_fit();
 
-    cout << "DONE!" << "\n";
+    cout << "DONE!\n\n";
     
-    cout << "upload conv1 kernel ..." << endl;
-    timer.start(" * ");
+    cout << "conv1 start!\nparameter encoding ... ";
+    timer.start("");
 
     vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block7conv1summands64(64, ptxt_init);
@@ -1527,8 +1506,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     
     timer.end();
     
-    cout << "layer4 DSB conv1 ..." << endl;
-    timer.start(" * ");
+    cout << "convolution ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block7conv1_out(1, vector<Ciphertext>(64, ctxt_init));
     for (int i = 0; i < 1; ++i) {
         ctxt_block7conv1_out[i] = Conv_parallel(context, pack, eval, 32, 4, 1, 64, 64, ctxt_block7relu0_out[i], block7conv1multiplicands64_64_3_3);
@@ -1545,9 +1524,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     block7conv1summands64.clear();
     block7conv1summands64.shrink_to_fit();
 
-    cout << "Done!! \n\n";
-
-
+    
     //////////////////////////// Main flow + Residual flow //////////////////////////////////
     cout << " Add two flows ..." << endl;
     vector<vector<Ciphertext>> ctxt_block7add_out(1, vector<Ciphertext>(64, ctxt_init));
@@ -1564,11 +1541,9 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block7MPP1_out.clear();
     ctxt_block7MPP1_out.shrink_to_fit();
 
-    cout << "DONE!" << "\n";
-
     // Last AppReLU
-    cout << "AppReLU ... " << endl;
-    timer.start(" * ");
+    cout << "AppReLU ... ";
+    timer.start("");
     vector<vector<Ciphertext>> ctxt_block7relu1_out(1, vector<Ciphertext>(64, ctxt_init));
     ApproxReLU_bundle(context, eval, ctxt_block7add_out, ctxt_block7relu1_out);
 
@@ -1587,7 +1562,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block7add_out.clear();
     ctxt_block7add_out.shrink_to_fit();
     
-    cout << "layer4 DSB is DONE!" << "\n";
+    cout << "DONE!\n\n";
     
     return ctxt_block7relu1_out;
 
