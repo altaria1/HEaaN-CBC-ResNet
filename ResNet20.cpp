@@ -350,20 +350,14 @@ int main() {
     layer4_block2_out.shrink_to_fit();
     
     //FC64 setup...
-    
-    
-    string common_path_mult = "/app/HEAAN-ResNet/kernel/ResNet20/multiplicands/";
-    string common_path_sum = "/app/HEAAN-ResNet/kernel/ResNet20/summands/";
-    
-    
-    cout << "uploading for FC64 layer ...\n\n";
-    timer.start(" FC64 layer * ");
+
+    cout << "uploading for FC64 layer ...";
+    timer.start(" * ");
     vector<double> temp21;
     vector<vector<Plaintext>> fclayermultiplicands10_64(10, vector<Plaintext>(64, ptxt_init));
     string path56 = common_path_mult + string("fc_weight_10_64.txt");
     double cnst2 = (double)(1.0 / 64.0);
     Scaletxtreader(temp21, path56,cnst2);
-    
     
     #pragma omp parallel for collapse(2)
     for (int i = 0; i < 10; ++i) {
