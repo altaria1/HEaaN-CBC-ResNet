@@ -30,7 +30,7 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block0conv0summands16(16, ptxt_init);
 
-    kernelEncode(context, pathmult, pathsum, block0conv0multiplicands16_3_3_3, block0conv0summands16, 5, 1, 1, 16, 3, 3, ecd);
+    kernelEncode(context, pathmult, pathsum, block0conv0multiplicands16_3_3_3, block0conv0summands16, cnst, 5, 1, 1, 16, 3, 3, ecd);
 
     // vector<double> temp0;
     // vector<vector<vector<Plaintext>>> block0conv0multiplicands16_3_3_3(16, vector<vector<Plaintext>>(3, vector<Plaintext>(9, ptxt_init)));
@@ -72,8 +72,8 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     addBNsummands(context, eval, ctxt_block0conv0_out, block0conv0summands16, 16, 16);
     timer.end();
 
-    imageVec.clear();
-    imageVec.shrink_to_fit();
+    input.clear();
+    input.shrink_to_fit();
 
     cout <<"\n";
 
@@ -126,10 +126,6 @@ string pathmult, string pathsum, vector<vector<Ciphertext>>& input){
     
     ctxt_block0conv0_out.clear();
     ctxt_block0conv0_out.shrink_to_fit();
-    cout << "DONE!, decrypted message is ... " << "\n";
-
-    dec.decrypt(ctxt_block0relu0_out[0][0], sk, dmsg);
-    printMessage(dmsg);
 
     cout << "block0 DONE!\n" << "\n";
     
@@ -151,7 +147,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum1(16, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, 5, 1, 1, 16, 16, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, cnst, 5, 1, 1, 16, 16, 3, ecd);
     // vector<double> temp1;
     // vector<vector<vector<Plaintext>>> kernel1(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     // txtreader(temp1, pathmult1);
@@ -260,7 +256,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum2(16, ptxt_init);
 
-    kernelEncode(contextm pathmult2, pathsum2, kernel2, BNsum2, 5, 1, 1, 16, 16, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, kernel2, BNsum2, cnst, 5, 1, 1, 16, 16, 3, ecd);
 
     // vector<double> temp2;
     // vector<vector<vector<Plaintext>>> kernel2(16, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -396,7 +392,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum1(32, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, 5, 2, 1, 32, 32, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, kernel1, BNsum1, cnst, 5, 2, 1, 32, 32, 3, ecd);
 
     // vector<double> temp10;
     // vector<vector<vector<Plaintext>>> kernel1(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -491,7 +487,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> BNsum2(32, ptxt_init);
 
-    kernelEncode(context, pathmult2, pathsum2, 5, 2, 1, 32, 32, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, kernel2, BNsum2, cnst, 5, 2, 1, 32, 32, 3, ecd);
 
     // vector<double> temp11;
     // vector<vector<vector<Plaintext>>> kernel2(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -613,7 +609,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias1(64, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, 5, 4, 1, 64, 64, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, kernel1, bias1, cnst, 5, 4, 1, 64, 64, 3, ecd);
 
     // vector<double> temp17;
     // vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -693,7 +689,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias2(64, ptxt_init);
 
-    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, 5, 4, 1, 64, 64, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, cnst, 5, 4, 1, 64, 64, 3, ecd);
 
     // vector<double> temp18;
     // vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -800,7 +796,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias1(64, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, 5, 4, 1, 64, 64, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, kernel1, bias1, cnst, 5, 4, 1, 64, 64, 3, ecd);
 
     // vector<double> temp17;
     // vector<vector<vector<Plaintext>>> kernel1(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -881,7 +877,7 @@ vector<vector<Ciphertext>>& input){
     vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> bias2(64, ptxt_init);
 
-    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, 5, 4, 1, 64, 64, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, kernel2, bias2, cnst, 5, 4, 1, 64, 64, 3, ecd);
 
     // vector<double> temp18;
     // vector<vector<vector<Plaintext>>> kernel2(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -984,7 +980,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16_1_1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
     vector<Plaintext> block4conv_onebyone_summands32(32, ptxt_init);
 
-    kernelEncode(context, pathmult0, pathsum0, block4conv_onebyone_multiplicands32_16_1_1, block4conv_onebyone_summands32, 5, 1, 2, 32, 16, 1, ecd);
+    kernelEncode(context, pathmult0, pathsum0, block4conv_onebyone_multiplicands32_16_1_1, block4conv_onebyone_summands32, cnst, 5, 1, 2, 32, 16, 1, ecd);
 
     // vector<double> temp7;
     // vector<vector<vector<Plaintext>>> block4conv_onebyone_multiplicands32_16__1(32, vector<vector<Plaintext>>(16, vector<Plaintext>(1, ptxt_init)));
@@ -1071,7 +1067,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block4conv0summands32(32, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, block4conv0multiplicands32_16_3_3, block4conv0summands32, 5, 1, 2, 32, 16, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, block4conv0multiplicands32_16_3_3, block4conv0summands32, cnst, 5, 1, 2, 32, 16, 3, ecd);
 
     // vector<double> temp8;
     // vector<vector<vector<Plaintext>>> block4conv0multiplicands32_16_3_3(32, vector<vector<Plaintext>>(16, vector<Plaintext>(9, ptxt_init)));
@@ -1197,7 +1193,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block4conv1summands32(32, ptxt_init);
 
-    kernelEncode(context, pathmult2, pathsum2, block4conv1multiplicands32_32_3_3, block4conv1summands32, 5, 2, 1, 32, 32, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, block4conv1multiplicands32_32_3_3, block4conv1summands32, cnst, 5, 2, 1, 32, 32, 3, ecd);
 
     // vector<double> temp9;
     // vector<vector<vector<Plaintext>>> block4conv1multiplicands32_32_3_3(32, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -1322,7 +1318,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     vector<Plaintext> block7conv_onebyone_summands64(64, ptxt_init);
 
-    kernelEncode(context, pathmult0, pathsum0, block7conv_onebyone_multiplicands64_32_1_1, block7conv_onebyone_summands64)
+    kernelEncode(context, pathmult0, pathsum0, block7conv_onebyone_multiplicands64_32_1_1, block7conv_onebyone_summands64, cnst, 5, 2, 2, 64, 32, 1, ecd);
     
     vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     
@@ -1364,7 +1360,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     for (int i = 0; i < 4; ++i) {
         #pragma omp parallel num_threads(10)
         {
-            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv_onebyone_multiplicands64_32_1_1);
+            ctxt_block7conv_onebyone_out[i] = Conv(context, pack, eval, 32, 2, 2, 32, 64, input[i], block7conv_onebyone_multiplicands64_32_1_1);
         }
     }
 
@@ -1416,7 +1412,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block7conv0summands64(64, ptxt_init);
 
-    kernelEncode(context, pathmult1, pathsum1, block7conv0multiplicands64_32_3_3, block7conv0summands64, 5, 2, 2, 64, 32, 3, ecd);
+    kernelEncode(context, pathmult1, pathsum1, block7conv0multiplicands64_32_3_3, block7conv0summands64, cnst, 5, 2, 2, 64, 32, 3, ecd);
 
     // vector<double> temp15;
     // vector<vector<vector<Plaintext>>> block7conv0multiplicands64_32_3_3(64, vector<vector<Plaintext>>(32, vector<Plaintext>(9, ptxt_init)));
@@ -1450,8 +1446,8 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
         ctxt_block7conv0_out[i] = Conv_parallel(context, pack, eval, 32, 2, 2, 32, 64, ctxt_block6relu1_out[i], block7conv0multiplicands64_32_3_3);
     }
 
-    ctxt_block6relu1_out.clear();
-    ctxt_block6relu1_out.shrink_to_fit();
+    input.clear();
+    input.shrink_to_fit();
 
     block7conv0multiplicands64_32_3_3.clear();
     block7conv0multiplicands64_32_3_3.shrink_to_fit();
@@ -1522,7 +1518,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
     vector<Plaintext> block7conv1summands64(64, ptxt_init);
 
-    kernelEncode(context, pathmult2, pathsum2, block7conv1multiplicands64_64_3_3, block7conv1summands64, 5, 4, 1, 64, 64, 3, ecd);
+    kernelEncode(context, pathmult2, pathsum2, block7conv1multiplicands64_64_3_3, block7conv1summands64, cnst, 5, 4, 1, 64, 64, 3, ecd);
 
     // vector<double> temp16;
     // vector<vector<vector<Plaintext>>> block7conv1multiplicands64_64_3_3(64, vector<vector<Plaintext>>(64, vector<Plaintext>(9, ptxt_init)));
@@ -1609,10 +1605,6 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
 
     ctxt_block7add_out.clear();
     ctxt_block7add_out.shrink_to_fit();
-    
-    cout << "DONE!, decrypted message is ...\n\n";
-    dec.decrypt(ctxt_block7relu1_out[0][0], sk, dmsg);
-    printMessage(dmsg);
     
     cout << "layer4 DSB is DONE!" << "\n";
     
