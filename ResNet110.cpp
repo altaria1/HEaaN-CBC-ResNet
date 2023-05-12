@@ -90,7 +90,7 @@ int main() {
 
     int num;
     
-    cout << "10000 test image encoding; choose one of bundle from 1 to 20 \n;
+    cout << "10000 test image encoding; choose one of bundle from 1 to 20 \n";
     cin >> num;
 
     vector<vector<Ciphertext>> imageVec(16, vector<Ciphertext>(3, ctxt_zero));
@@ -122,7 +122,7 @@ int main() {
     
     //// 0st conv ///
     std::cout << "layer1 convolution .. " << std::endl;
-    vector<vector<Ciphertext>> layer2_block6_out;
+    vector<vector<Ciphertext>> ctxt_block0relu0_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
     ctxt_block0relu0_out = Conv_first(timer, context, pack, eval, ecd, ctxt_init, ptxt_init, cnst, log_slots,
@@ -510,6 +510,9 @@ int main() {
     dec.decrypt(layer3_block0_out[0][0], sk, dmsg);
     printMessage(dmsg);
     cout <<"\n";
+    
+    layer2_block17_out.clear();
+    layer2_block17_out.shrink_to_fit();
 
      // result save.
     cout << "saving DSB1 ctxt_result_bundel.." << endl;
@@ -533,8 +536,8 @@ int main() {
     printMessage(dmsg);
     cout <<"\n";
     
-    ctxt_block4relu1_out.clear();
-    ctxt_block4relu1_out.shrink_to_fit();
+    layer3_block0_out.clear();
+    layer3_block0_out.shrink_to_fit();
 
     
     //////////RB21///////////////
