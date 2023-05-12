@@ -125,7 +125,7 @@ int main() {
     ////////////////////////////////////////////////////////////
     
     //// 0st conv ///
-    std::cout << "layer1 convolution .. " << std::endl;
+    std::cout << "layer1 Convolution .. " << std::endl;
     vector<vector<Ciphertext>> ctxt_block0relu0_out;
     string path0 = common_path_mult + string("layer1_weight_16_3_3_3.txt");
     string path0a = common_path_sum + string("layer1_bias_16.txt");
@@ -146,7 +146,7 @@ int main() {
     ////////////////////
     /////// RB1 ////////
     ////////////////////
-    std::cout << "layer2_RB1 ... " << std::endl;
+    std::cout << "layer2 Residual Block 1 ... " << std::endl;
     vector<vector<Ciphertext>> layer2_block0_out;
     string path1 = common_path_mult + string("layer2_0_conv1_weight_16_16_3_3.txt");
     string path1a = common_path_sum + string("layer2_0_conv1_bias_16.txt");
@@ -166,7 +166,8 @@ int main() {
     ////////////////////
     /////// RB2 ////////
     ////////////////////
-    std::cout << "layer2_RB2 ... " << std::endl;
+    
+    std::cout << "layer2 Residual Block 2 ... " << std::endl;
     vector<vector<Ciphertext>> layer2_block1_out;
     string path2 = common_path_mult + string("layer2_1_conv1_weight_16_16_3_3.txt");
     string path2a = common_path_sum + string("layer2_1_conv1_bias_16.txt");
@@ -186,7 +187,8 @@ int main() {
     ////////////////////
     /////// RB3 ////////
     ////////////////////
-    std::cout << "layer2_RB3 ... " << std::endl;
+    
+    std::cout << "layer2 Residual Block 3 ... " << std::endl;
     vector<vector<Ciphertext>> layer2_block2_out;
     string path3 = common_path_mult + string("layer2_2_conv1_weight_16_16_3_3.txt");
     string path3a = common_path_sum + string("layer2_2_conv1_bias_16.txt");
@@ -207,7 +209,7 @@ int main() {
     /////// DSB1 ///////
     ////////////////////
     
-    std::cout << "layer3_DSB1 .. " << std::endl;
+    std::cout << "layer3 Downsampling Residual Block1 .. " << std::endl;
     vector<vector<Ciphertext>> ctxt_block4relu1_out;
     
     string path4 = common_path_mult + string("layer3_0_downsample_weight_32_16_1_1.txt");
