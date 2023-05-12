@@ -67,11 +67,38 @@ void addBNsummands(Context context, HomEvaluator eval, vector<vector<Ciphertext>
     return;
 }
 
-void kernelEncode(Context context, string pathmult, string pathsum, vector<vector<vector<Plaintext>>>& weight, vector<Plaintext>& bias, const double cnst, 
+
+
+void kernelEncode_first(Context context, string pathmult, string pathsum, vector<vector<vector<Plaintext>>>& weight, vector<Plaintext>& bias, const double cnst, 
 u64 level, u64 gap_in, u64 stride, const int out_ch, const int in_ch, const int ker_size, EnDecoder ecd){
 
     vector<double> temp0;
     Scaletxtreader(temp0, pathmult, cnst);
+    
+    kernel_ptxt(context, temp0, weight, level, gap_in, stride, out_ch, in_ch, ker_size, ecd);
+
+    vector<double> temp0a;
+    Scaletxtreader(temp0a, pathsum, cnst);
+
+    #pragma omp parallel for num_threads(40)
+    for (int i = 0; i < out_ch; ++i) {
+        {
+            Message msg(15, temp0a[i]);
+            bias[i]=ecd.encode(msg, 4, 0);
+        }
+    }
+
+    return;
+    
+}
+
+
+
+void kernelEncode(Context context, string pathmult, string pathsum, vector<vector<vector<Plaintext>>>& weight, vector<Plaintext>& bias, const double cnst, 
+u64 level, u64 gap_in, u64 stride, const int out_ch, const int in_ch, const int ker_size, EnDecoder ecd){
+
+    vector<double> temp0;
+    txtreader(temp0, pathmult);
     
     kernel_ptxt(context, temp0, weight, level, gap_in, stride, out_ch, in_ch, ker_size, ecd);
 
