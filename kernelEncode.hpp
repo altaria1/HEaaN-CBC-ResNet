@@ -77,6 +77,9 @@ u64 level, u64 gap_in, u64 stride, const int out_ch, const int in_ch, const int 
 
     vector<double> temp0a;
     Scaletxtreader(temp0a, pathsum, cnst);
+ 
+    Message msg(15);
+    auto num_slots = msg1.getSize();
 
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < out_ch; ++i) {
