@@ -1012,7 +1012,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv_onebyone_multiplicands32_16_1_1);
+            ctxt_block4conv_onebyone_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv_onebyone_multiplicands32_16_1_1);
         }
     }
 
@@ -1106,8 +1106,8 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
         }
     }
 
-    ctxt_block3relu1_out.clear();
-    ctxt_block3relu1_out.shrink_to_fit();
+    input.clear();
+    input.shrink_to_fit();
 
     block4conv0multiplicands32_16_3_3.clear();
     block4conv0multiplicands32_16_3_3.shrink_to_fit();
@@ -1295,10 +1295,6 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     ctxt_block4add_out.clear();
     ctxt_block4add_out.shrink_to_fit();
     
-    cout << "DONE!, decrypted message is ... " << "\n";
-
-    dec.decrypt(ctxt_block4relu1_out[0][0], sk, dmsg);
-    printMessage(dmsg);
     cout << "layer3 Downsampling block DONE!" << "\n";
     
     return ctxt_block4relu1_out;
@@ -1320,10 +1316,10 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
 
     kernelEncode(context, pathmult0, pathsum0, block7conv_onebyone_multiplicands64_32_1_1, block7conv_onebyone_summands64, cnst, 5, 2, 2, 64, 32, 1, ecd);
     
-    vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     
     // vector<double> temp14;
     // txtreader(temp14, pathmult0);
+    // vector<vector<vector<Plaintext>>> block7conv_onebyone_multiplicands64_32_1_1(64, vector<vector<Plaintext>>(32, vector<Plaintext>(1, ptxt_init)));
     // kernel_ptxt(context, temp14, block7conv_onebyone_multiplicands64_32_1_1, 5, 2, 2, 64, 32, 1, ecd);
     
     // temp14.clear();
