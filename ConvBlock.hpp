@@ -1307,7 +1307,7 @@ vector<vector<Ciphertext>> DSB2(HEaaNTimer timer, Context context, KeyPack pack,
     string pathmult0, string pathsum0, string pathmult1, string pathsum1, string pathmult2, string pathsum2,
     vector<vector<Ciphertext>>& input){
     
-    cout << "layer4 DSB start ...\n\n";
+    cout << "layer4 DSB start ...\n";
     cout << "upload conv_onebyone kernel ..." << endl;
     timer.start(" * ");
     
