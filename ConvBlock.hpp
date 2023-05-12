@@ -1102,7 +1102,7 @@ vector<vector<Ciphertext>> DSB1(HEaaNTimer timer, Context context, KeyPack pack,
     #pragma omp parallel for num_threads(40)
     for (int i = 0; i < 16; ++i) {
         {
-            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, ctxt_block3relu1_out[i], block4conv0multiplicands32_16_3_3);
+            ctxt_block4conv0_out[i] = Conv(context, pack, eval, 32, 1, 2, 16, 32, input[i], block4conv0multiplicands32_16_3_3);
         }
     }
 
