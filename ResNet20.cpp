@@ -352,11 +352,15 @@ int main() {
     //FC64 setup...
     
     
+    string common_path_mult = "/app/HEAAN-ResNet/kernel/ResNet20/multiplicands/";
+    string common_path_sum = "/app/HEAAN-ResNet/kernel/ResNet20/summands/";
+    
+    
     cout << "uploading for FC64 layer ...\n\n";
     timer.start(" FC64 layer * ");
     vector<double> temp21;
     vector<vector<Plaintext>> fclayermultiplicands10_64(10, vector<Plaintext>(64, ptxt_init));
-    string path56 = "/app/HEAAN-ResNet-20/resnet20/multiplicands/" + string("fc_weight_10_64.txt");
+    string path56 = common_path_mult + string("fc_weight_10_64.txt");
     double cnst2 = (double)(1.0 / 64.0);
     Scaletxtreader(temp21, path56,cnst2);
     
@@ -374,7 +378,7 @@ int main() {
 
     vector<double> temp21a;
     vector<Plaintext> fclayersummands10(10, ptxt_init);
-    string path56a = "/app/HEAAN-ResNet-20/resnet20/summands/" + string("fc_bias_10.txt");
+    string path56a = common_path_sum + string("fc_bias_10.txt");
 
     double cnst1 = (double)(1.0 / 40.0);
     Scaletxtreader(temp21a, path56a, cnst1);
