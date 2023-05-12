@@ -103,7 +103,7 @@ int main() {
     #pragma omp parallel for
     for (int i = (num-1) * 16; i < num*16; ++i) { // 313
         int ind = i+1;
-        string str = "/app/HEAAN-ResNet-110/image/image_" + to_string(ind) + string(".txt");
+        string str = "/app/HEAAN-ResNet/image/image_" + to_string(ind) + string(".txt");
         vector<double> temp;
         txtreader(temp, str);
         imageCompiler(context, pack, enc, 5, temp, imageVec[(i%16)]);
@@ -395,7 +395,7 @@ int main() {
     cout << "evaluating FC64 layer\n" << endl;
 
     vector<Ciphertext> ctxt_result;
-    timer.start(" FC64 layer * ");
+    timer.start(" * ");
     ctxt_result = FC64(context, pack, eval, ctxt_avgp_out, fclayermultiplicands10_64, fclayersummands10);
     timer.end();
 
