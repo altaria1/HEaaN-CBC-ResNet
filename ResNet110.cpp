@@ -7,17 +7,15 @@
 #include <algorithm>
 
 #include "HEaaN/heaan.hpp" 
-#include "examples.hpp" 
 #include "Conv.hpp"
 #include "AppReLU.hpp"
-#include "MPPacking.hpp"
 #include "HEaaNTimer.hpp"
 #include "convtools.hpp"
 #include "kernelEncode.hpp"
 #include "imageEncode.hpp"
 #include "AvgpoolFC64.hpp"
-#include "RB.hpp"
-#include "DSB.hpp"
+#include "ConvBlock.hpp"
+
 
 namespace {
     using namespace HEaaN;
