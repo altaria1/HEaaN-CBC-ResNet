@@ -16,6 +16,7 @@ HEaaN::Ciphertext singleAvgpool(HEaaN::Context context, HEaaN::KeyPack pack, HEa
     return ctxt;
 }
 
+
 HEaaN::Ciphertext singleAvgpool2(HEaaN::Context context, HEaaN::KeyPack pack, HEaaN::HomEvaluator eval, HEaaN::Ciphertext &ctxt) {
     Ciphertext ctxt_temp(context);
     eval.leftRotate(ctxt, 4*32*4, ctxt_temp);
@@ -135,6 +136,86 @@ vector<HEaaN::Ciphertext> FC64(HEaaN::Context context, HEaaN::KeyPack pack, HEaa
 	#pragma omp parallel for 
 	for (u64 i=0;i<10 ;i++){
         eval.rescale(tmp[i][0]);
+        eval.add(tmp[i][0], bias[i], out[i]);
+    }
+    
+    return out;
+}
+
+vector<HEaaN::Ciphertext> FC64hybrid128(HEaaN::Context context, HEaaN::KeyPack pack, HEaaN::HomEvaluator eval, 
+                              vector<HEaaN::Ciphertext> &ctxt, vector<vector<HEaaN::Plaintext>> &ptxt, vector<HEaaN::Plaintext> &bias) {
+    //length of ctxt and ptxt[i] must be matched
+    HEaaN::Ciphertext zero_ct(context);
+    vector<HEaaN::Ciphertext> v(16, zero_ct);
+    vector<HEaaN::Ciphertext> out(10, zero_ct);
+    vector<vector<HEaaN::Ciphertext>> tmp(10, v);
+    int level1 = ctxt[0].getLevel();
+    int level2 = ptxt[0][0].getLevel();
+    for (u64 i=0;i<10 ;i++){
+	#pragma omp parallel for 
+        for (u64 j=0;j<16 ;j++){
+		if(level1 != level2){
+				ptxt[i][j].setLevel(level1);
+			}
+            eval.multWithoutRescale(ctxt[j], ptxt[i][j], tmp[i][j]);
+        }
+		for (u64 j=1;j<16 ;j++){
+			eval.add(tmp[i][0], tmp[i][j], tmp[i][0]);
+		}
+	}
+
+
+    #pragma omp parallel for 
+	for (u64 i=0;i<10 ;i++){
+        eval.rescale(tmp[i][0]);
+        //rotate sum for channels inside block
+        eval.leftRotate(tmp[i][0], 64, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+        eval.leftRotate(tmp[i][0], 2, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+
+        eval.add(tmp[i][0], bias[i], out[i]);
+    }
+    return out;
+}
+
+
+vector<HEaaN::Ciphertext> FC64hybrid32(HEaaN::Context context, HEaaN::KeyPack pack, HEaaN::HomEvaluator eval, 
+                              vector<HEaaN::Ciphertext> &ctxt, vector<vector<HEaaN::Plaintext>> &ptxt, vector<HEaaN::Plaintext> &bias) {
+    //length of ctxt and ptxt[i] must be matched
+    HEaaN::Ciphertext zero_ct(context);
+    vector<HEaaN::Ciphertext> v(4, zero_ct);
+    vector<HEaaN::Ciphertext> out(10, zero_ct);
+    vector<vector<HEaaN::Ciphertext>> tmp(10, v);
+    int level1 = ctxt[0].getLevel();
+    int level2 = ptxt[0][0].getLevel();
+    for (u64 i=0;i<10 ;i++){
+	#pragma omp parallel for 
+        for (u64 j=0;j<4 ;j++){
+		if(level1 != level2){
+				ptxt[i][j].setLevel(level1);
+			}
+            eval.multWithoutRescale(ctxt[j], ptxt[i][j], tmp[i][j]);
+        }
+		for (u64 j=1;j<4 ;j++){
+			eval.add(tmp[i][0], tmp[i][j], tmp[i][0]);
+		}
+	}
+
+
+    #pragma omp parallel for 
+	for (u64 i=0;i<10 ;i++){
+        eval.rescale(tmp[i][0]);
+        //rotate sum for channels inside block
+        eval.leftRotate(tmp[i][0], 64, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+        eval.leftRotate(tmp[i][0], 32, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+        eval.leftRotate(tmp[i][0], 2, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+        eval.leftRotate(tmp[i][0], 1, out[i]);
+        eval.add(tmp[i][0], out[i], tmp[i][0]);
+
         eval.add(tmp[i][0], bias[i], out[i]);
     }
     

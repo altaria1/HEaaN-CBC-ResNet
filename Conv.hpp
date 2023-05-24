@@ -3,6 +3,7 @@
 #include <vector>
 #include <omp.h>
 #include <cmath>
+#include "rotsum.hpp"
 
 namespace {
     using namespace HEaaN;
@@ -19,7 +20,148 @@ namespace {
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+vector<Plaintext> maskBundle128(EnDecoder ecd, HomEvaluator eval, Context context) {
+    int level = 4;
+    Message v(15);
+    vector<Message> msg(4, v);
+    Plaintext ptxt(context);
+    vector<Plaintext> out(4, ptxt);
 
+    for (size_t j = 0; j < 32768; ++j) {
+        msg[0][j].real(0.0);
+        msg[0][j].imag(0.0);
+    }
+    for (size_t i = 1; i < 4; ++i) {
+        msg[i] = msg[0];
+    }
+
+    for (size_t j = 0; j < 32768; ++j) {
+        if ((j%4)<2 && (j%128)<64) {
+            msg[0][j].real(1.0);
+        }
+        else if ((j%4)>=2 && (j%128)<64) {
+            msg[1][j].real(1.0);
+        }
+        else if ((j%4)<2 && (j%128)>=64) {
+            msg[2][j].real(1.0);
+        }
+        else if ((j%4)>=2 && (j%128)>=64) {
+            msg[3][j].real(1.0);
+        }
+    }
+    
+    for (size_t j = 0; j < 4; ++j) {
+        out[j] = ecd.encode(msg[j], level, 0);
+    }
+    return out;
+}
+
+vector<Plaintext> maskBundle32_1(EnDecoder ecd, HomEvaluator eval, Context context) {
+    int level = 4;
+    Message v(15);
+    vector<Message> msg(4, v);
+    Plaintext ptxt(context);
+    vector<Plaintext> out(4, ptxt);
+
+    for (size_t j = 0; j < 32768; ++j) {
+        msg[0][j].real(0.0);
+        msg[0][j].imag(0.0);
+    }
+    for (size_t i = 1; i < 4; ++i) {
+        msg[i] = msg[0];
+    }
+
+    for (size_t j = 0; j < 32768; ++j) {
+        if ((j%2)<1 && (j%64)<32) {
+            msg[0][j].real(1.0);
+        }
+        else if ((j%2)>=1 && (j%64)<32) {
+            msg[1][j].real(1.0);
+        }
+        else if ((j%2)<1 && (j%64)>=32) {
+            msg[2][j].real(1.0);
+        }
+        else if ((j%2)>=1 && (j%64)>=32) {
+            msg[3][j].real(1.0);
+        }
+    }
+
+    for (size_t j = 0; j < 4; ++j) {
+        out[j] = ecd.encode(msg[j], level, 0);
+    }
+    return out;
+}
+
+vector<Plaintext> maskBundle32_2(EnDecoder ecd, HomEvaluator eval, Context context) {
+    int level = 4;
+    Message v(15);
+    vector<Message> msg(16, v);
+    Plaintext ptxt(context);
+    vector<Plaintext> out(16, ptxt);
+    for (size_t j = 0; j < 32768; ++j) {
+        msg[0][j].real(0.0);
+        msg[0][j].imag(0.0);
+    }
+    for (size_t i = 1; i < 16; ++i) {
+        msg[i] = msg[0];
+    }
+    
+    for (size_t j = 0; j < 32768; ++j) {
+        if (j%4==0 && (j/32)%4==0) {
+            msg[0][j].real(1.0);
+        }
+        else if (j%4==1 && (j/32)%4==0) {
+            msg[1][j].real(1.0);
+        }
+        else if (j%4==0 && (j/32)%4==1) {
+            msg[2][j].real(1.0);
+        }
+        else if (j%4==1 && (j/32)%4==1) {
+            msg[3][j].real(1.0);
+        }
+        else if (j%4==2 && (j/32)%4==0) {
+            msg[4][j].real(1.0);
+        }
+        else if (j%4==3 && (j/32)%4==0) {
+            msg[5][j].real(1.0);
+        }
+        else if (j%4==2 && (j/32)%4==1) {
+            msg[6][j].real(1.0);
+        }
+        else if (j%4==3 && (j/32)%4==1) {
+            msg[7][j].real(1.0);
+        }
+        else if (j%4==0 && (j/32)%4==2) {
+            msg[8][j].real(1.0);
+        }
+        else if (j%4==1 && (j/32)%4==2) {
+            msg[9][j].real(1.0);
+        }
+        else if (j%4==0 && (j/32)%4==3) {
+            msg[10][j].real(1.0);
+        }
+        else if (j%4==1 && (j/32)%4==3) {
+            msg[11][j].real(1.0);
+        }
+        else if (j%4==2 && (j/32)%4==2) {
+            msg[12][j].real(1.0);
+        }
+        else if (j%4==3 && (j/32)%4==2) {
+            msg[13][j].real(1.0);
+        }
+        else if (j%4==2 && (j/32)%4==3) {
+            msg[14][j].real(1.0);
+        }
+        else if (j%4==3 && (j/32)%4==3) {
+            msg[15][j].real(1.0);
+        }
+    }
+    
+    for (size_t j = 0; j < 16; ++j) {
+        out[j] = ecd.encode(msg[j], level, 0);
+    }
+    return out;
+}
 
 Ciphertext auxiliaryFtn1(HomEvaluator eval, Context context, vector<Ciphertext>& ctxtVec, vector<vector<Plaintext>>& ptxtVec, int input_channel) {
 
