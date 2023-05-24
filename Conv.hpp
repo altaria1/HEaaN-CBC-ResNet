@@ -21,7 +21,7 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 
 vector<Plaintext> maskBundle128(EnDecoder ecd, HomEvaluator eval, Context context) {
-    int level = 4;
+    int level = 5;
     Message v(15);
     vector<Message> msg(4, v);
     Plaintext ptxt(context);
@@ -57,7 +57,7 @@ vector<Plaintext> maskBundle128(EnDecoder ecd, HomEvaluator eval, Context contex
 }
 
 vector<Plaintext> maskBundle32_1(EnDecoder ecd, HomEvaluator eval, Context context) {
-    int level = 4;
+    int level = 5;
     Message v(15);
     vector<Message> msg(4, v);
     Plaintext ptxt(context);
@@ -93,7 +93,7 @@ vector<Plaintext> maskBundle32_1(EnDecoder ecd, HomEvaluator eval, Context conte
 }
 
 vector<Plaintext> maskBundle32_2(EnDecoder ecd, HomEvaluator eval, Context context) {
-    int level = 4;
+    int level = 5;
     Message v(15);
     vector<Message> msg(16, v);
     Plaintext ptxt(context);
