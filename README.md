@@ -1,6 +1,5 @@
 # HEAAN-ResNet
 
-ㅎㅎㅎㅎ
 
 
 
